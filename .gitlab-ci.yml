@@ -1,0 +1,60 @@
+include:
+  - project: 'dhei/teams/io/templates/gitlab-pipelines'
+    file: '/docker/gitlab-ci.docker.yml'
+    ref: develop
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+
+variables:
+  MTR_TARGET_IMAGE:   $CI_PROJECT_NAME
+  MTR_TARGET_TAG:     $CI_COMMIT_REF_NAME
+
+stages:
+- test
+- dockerize
+- publish
+
+default:
+  tags: [ "otc_run_docker_m" ]
+
+# jobs
+
+semgrep:
+  image: returntocorp/semgrep
+  stage: test
+  when: manual
+  script: semgrep ci --gitlab-sast > gl-sast-report.json || true
+  rules:
+  - changes:
+      - .gitlab-ci.yml
+  - if: $CI_PIPELINE_SOURCE == "web"
+  - if: $CI_MERGE_REQUEST_IID
+  - if: $CI_PIPELINE_SOURCE == "push"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_COMMIT_BRANCH == "develop"
+  
+  variables:
+    SEMGREP_RULES: >-
+      p/security-audit
+      p/secrets
+      p/default
+      p/ci
+      p/docker
+    SEMGREP_GITLAB_JSON: "1"
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+
+
+build:image:
+  extends: .docker:build:mtr-devops-common-with-dependencies
+  stage: dockerize
+  when: manual
+  
+publish:image:
+  extends: .docker:mirror:mtr-devops-common-to-customer
+  stage: publish
+  when: manual
+  only:
+    - tags
+  dependencies: []
