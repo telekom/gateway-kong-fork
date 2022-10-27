@@ -13,6 +13,7 @@ WORKDIR /tmp/kong
 #RUN cd kong-plugin-eni-prometheus && luarocks make
 RUN ls
 RUN luarocks make
+RUN ls
 
 USER kong
 
