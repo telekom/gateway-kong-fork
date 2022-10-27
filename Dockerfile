@@ -11,8 +11,8 @@ WORKDIR /tmp/kong
 #RUN cd kong-plugin-jwt-keycloak && luarocks make
 #RUN cd eni-zipkin && luarocks make
 #RUN cd kong-plugin-eni-prometheus && luarocks make
-RUN cd kong/plugins/ && ls
-RUN luarocks make
+RUN ls
+RUN cd /kong/plugins/eni-zipkin && luarocks make
 
 USER kong
 
