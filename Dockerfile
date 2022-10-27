@@ -9,8 +9,9 @@ ADD kong/plugins /tmp/plugins
 WORKDIR /tmp/plugins
 
 #RUN cd kong-plugin-jwt-keycloak && luarocks make
-RUN cd eni-zipkin && luarocks make
+#RUN cd eni-zipkin && luarocks make
 #RUN cd kong-plugin-eni-prometheus && luarocks make
+RUN luarocks make
 
 USER kong
 
