@@ -21,11 +21,11 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["kong.plugins.eni-zipkin.handler"] = "kong/plugins/zipkin/handler.lua",
-    ["kong.plugins.eni-zipkin.reporter"] = "kong/plugins/zipkin/reporter.lua",
-    ["kong.plugins.eni-zipkin.span"] = "kong/plugins/zipkin/span.lua",
-    ["kong.plugins.eni-zipkin.tracing_headers"] = "kong/plugins/zipkin/tracing_headers.lua",
-    ["kong.plugins.eni-zipkin.schema"] = "kong/plugins/zipkin/schema.lua",
-    ["kong.plugins.eni-zipkin.request_tags"] = "kong/plugins/zipkin/request_tags.lua",
+    ["kong.plugins.eni-zipkin.handler"] = "kong/plugins/eni-zipkin/handler.lua",
+    ["kong.plugins.eni-zipkin.reporter"] = "kong/plugins/eni-zipkin/reporter.lua",
+    ["kong.plugins.eni-zipkin.span"] = "kong/plugins/eni-zipkin/span.lua",
+    ["kong.plugins.eni-zipkin.tracing_headers"] = "kong/plugins/eni-zipkin/tracing_headers.lua",
+    ["kong.plugins.eni-zipkin.schema"] = "kong/plugins/eni-zipkin/schema.lua",
+    ["kong.plugins.eni-zipkin.request_tags"] = "kong/plugins/eni-zipkin/request_tags.lua",
   },
 }
