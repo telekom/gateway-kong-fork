@@ -4,9 +4,9 @@ USER root
 
 RUN set -ex && apk add --no-cache curl gcc libc-dev
 
-ADD kong/plugins /tmp/plugins
+ADD / /tmp/kong
 
-WORKDIR /tmp/plugins
+WORKDIR /tmp/kong
 
 #RUN cd kong-plugin-jwt-keycloak && luarocks make
 #RUN cd eni-zipkin && luarocks make
