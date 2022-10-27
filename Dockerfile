@@ -4,12 +4,12 @@ USER root
 
 RUN set -ex && apk add --no-cache curl gcc libc-dev
 
-ADD plugins /tmp/plugins
+ADD kong/plugins /tmp/plugins
 
 WORKDIR /tmp/plugins
 
 #RUN cd kong-plugin-jwt-keycloak && luarocks make
-RUN cd kong-plugin-eni-zipkin && luarocks make
+RUN cd eni-zipkin && luarocks make
 #RUN cd kong-plugin-eni-prometheus && luarocks make
 
 USER kong
@@ -32,7 +32,7 @@ RUN \
 # If you just want to add a plugin from the source code comitted with this pipeline (/plugins dir)
 RUN luarocks pack lua-cjson
 #RUN luarocks pack kong-plugin-jwt-keycloak
-RUN luarocks pack kong-plugin-eni-zipkin
+RUN luarocks pack eni-zipkin
 #RUN luarocks pack kong-plugin-eni-prometheus
 RUN luarocks pack lua-resty-http
 RUN luarocks pack lua-resty-counter
