@@ -12,7 +12,7 @@ WORKDIR /tmp/kong
 #RUN cd eni-zipkin && luarocks make
 #RUN cd kong-plugin-eni-prometheus && luarocks make
 RUN ls
-RUN cd kong/plugins/eni-zipkin && luarocks make
+RUN luarocks make
 
 USER kong
 
