@@ -41,7 +41,6 @@ dependencies = {
   "lua-resty-ipmatcher == 0.6.1",
   "lua-resty-acme == 0.7.2",
   "lua-resty-session == 3.10",
-  "lua-cjson",
 }
 build = {
   type = "builtin",
@@ -422,6 +421,14 @@ build = {
     ["kong.plugins.prometheus.prometheus"] = "kong/plugins/prometheus/prometheus.lua",
     ["kong.plugins.prometheus.serve"] = "kong/plugins/prometheus/serve.lua",
     ["kong.plugins.prometheus.schema"] = "kong/plugins/prometheus/schema.lua",
+
+    ["kong.plugins.eni-prometheus.api"] = "kong/plugins/eni-prometheus/api.lua",
+    ["kong.plugins.eni-prometheus.status_api"] = "kong/plugins/eni-prometheus/status_api.lua",
+    ["kong.plugins.eni-prometheus.exporter"] = "kong/plugins/eni-prometheus/exporter.lua",
+    ["kong.plugins.eni-prometheus.handler"] = "kong/plugins/eni-prometheus/handler.lua",
+    ["kong.plugins.eni-prometheus.prometheus"] = "kong/plugins/eni-prometheus/prometheus.lua",
+    ["kong.plugins.eni-prometheus.serve"] = "kong/plugins/eni-prometheus/serve.lua",
+    ["kong.plugins.eni-prometheus.schema"] = "kong/plugins/eni-prometheus/schema.lua",
 
     ["kong.plugins.session.handler"] = "kong/plugins/session/handler.lua",
     ["kong.plugins.session.schema"] = "kong/plugins/session/schema.lua",

@@ -1,0 +1,12 @@
+./idea
+./makefiles
+.git
+Dockerfile
+Makefile
+README.md
+Dockerfile
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

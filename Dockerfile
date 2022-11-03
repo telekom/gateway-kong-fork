@@ -1,4 +1,4 @@
-FROM mtr.devops.telekom.de/tardis-common/kong:2.8.1-alpine
+FROM mtr.devops.telekom.de/tardis-common/kong:2.8.1-alpine as builder
 
 USER root
 
@@ -8,12 +8,9 @@ ADD / /tmp/kong
 
 WORKDIR /tmp/kong
 
-#RUN cd kong-plugin-jwt-keycloak && luarocks make
+RUN cd kong/plugins/jwt-keycloak && luarocks make
 RUN cd kong/plugins/eni-zipkin && luarocks make
-#RUN cd kong-plugin-eni-prometheus && luarocks make
-RUN ls
-RUN luarocks make
-RUN ls
+RUN cd kong/plugins/eni-prometheus && luarocks make
 
 USER kong
 
@@ -41,4 +38,3 @@ RUN luarocks pack eni-zipkin
 RUN luarocks pack lua-resty-http
 RUN luarocks pack lua-resty-counter
 
-#RUN rm -rf /home/kong/.luarocks
