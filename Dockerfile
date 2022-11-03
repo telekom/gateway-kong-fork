@@ -2,7 +2,7 @@ FROM mtr.devops.telekom.de/tardis-common/kong:2.8.1-alpine as builder
 
 USER root
 
-RUN set -ex && apk add --no-cache curl gcc libc-dev
+RUN set -ex && apk add --no-cache curl gcc libc-dev tree
 
 ADD / /tmp/kong
 
@@ -11,6 +11,7 @@ WORKDIR /tmp/kong
 RUN cd kong/plugins/jwt-keycloak && luarocks make
 RUN cd kong/plugins/eni-zipkin && luarocks make
 RUN cd kong/plugins/eni-prometheus && luarocks make
+RUN tree
 
 USER kong
 
