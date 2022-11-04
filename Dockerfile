@@ -11,9 +11,9 @@ WORKDIR /tmp/kong
 #RUN cd kong-plugin-jwt-keycloak && luarocks make
 #RUN cd eni-zipkin && luarocks make
 #RUN cd kong-plugin-eni-prometheus && luarocks make
-RUN tree /usr/local
+#RUN tree /usr/local
 RUN luarocks make
-RUN tree /usr/local
+#RUN tree /usr/local
 
 USER kong
 
@@ -34,11 +34,11 @@ RUN \
 
 RUN luarocks list
 # If you just want to add a plugin from the source code comitted with this pipeline (/plugins dir)
-RUN luarocks pack lua-cjson
+#RUN luarocks pack lua-cjson
 #RUN luarocks pack kong-plugin-jwt-keycloak
-RUN luarocks pack eni-zipkin
+#RUN luarocks pack eni-zipkin
 #RUN luarocks pack kong-plugin-eni-prometheus
-RUN luarocks pack lua-resty-http
-RUN luarocks pack lua-resty-counter
+#RUN luarocks pack lua-resty-http
+#RUN luarocks pack lua-resty-counter
 
 #RUN rm -rf /home/kong/.luarocks
