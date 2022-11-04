@@ -415,6 +415,15 @@ build = {
     ["kong.plugins.acme.schema"] = "kong/plugins/acme/schema.lua",
     ["kong.plugins.acme.storage.kong"] = "kong/plugins/acme/storage/kong.lua",
 
+    ["kong.plugins.jwt-keycloak.validators.issuers"] = "kong/plugins/validators/issuers.lua",
+    ["kong.plugins.jwt-keycloak.validators.roles"] = "kong/plugins/validators/roles.lua",
+    ["kong.plugins.jwt-keycloak.validators.scope"] = "kong/plugins/validators/scope.lua",
+    ["kong.plugins.jwt-keycloak.tardis.securitylog"] = "kong/plugins/tardis/securitylog.lua",
+    ["kong.plugins.jwt-keycloak.handler"] = "kong/plugins/handler.lua",
+    ["kong.plugins.jwt-keycloak.key_conversion"] = "kong/plugins/key_conversion.lua",
+    ["kong.plugins.jwt-keycloak.keycloak_keys"] = "kong/plugins/keycloak_keys.lua",
+    ["kong.plugins.jwt-keycloak.schema"]  = "kong/plugins/schema.lua",
+
     ["kong.plugins.eni-prometheus.api"] = "kong/plugins/eni-prometheus/api.lua",
     ["kong.plugins.eni-prometheus.status_api"] = "kong/plugins/eni-prometheus/status_api.lua",
     ["kong.plugins.eni-prometheus.exporter"] = "kong/plugins/eni-prometheus/exporter.lua",
