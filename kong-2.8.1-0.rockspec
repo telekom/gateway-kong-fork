@@ -415,6 +415,15 @@ build = {
     ["kong.plugins.acme.schema"] = "kong/plugins/acme/schema.lua",
     ["kong.plugins.acme.storage.kong"] = "kong/plugins/acme/storage/kong.lua",
 
+    ["kong.plugins.eni-prometheus.api"] = "kong/plugins/eni-prometheus/api.lua",
+    ["kong.plugins.eni-prometheus.status_api"] = "kong/plugins/eni-prometheus/status_api.lua",
+    ["kong.plugins.eni-prometheus.exporter"] = "kong/plugins/eni-prometheus/exporter.lua",
+    ["kong.plugins.eni-prometheus.enterprise.exporter"] = "kong/plugins/eni-prometheus/enterprise/exporter.lua",
+    ["kong.plugins.eni-prometheus.handler"] = "kong/plugins/eni-prometheus/handler.lua",
+    ["kong.plugins.eni-prometheus.prometheus"] = "kong/plugins/eni-prometheus/prometheus.lua",
+    ["kong.plugins.eni-prometheus.serve"] = "kong/plugins/eni-prometheus/serve.lua",
+    ["kong.plugins.eni-prometheus.schema"] = "kong/plugins/eni-prometheus/schema.lua",
+
     ["kong.plugins.prometheus.api"] = "kong/plugins/prometheus/api.lua",
     ["kong.plugins.prometheus.status_api"] = "kong/plugins/prometheus/status_api.lua",
     ["kong.plugins.prometheus.exporter"] = "kong/plugins/prometheus/exporter.lua",
