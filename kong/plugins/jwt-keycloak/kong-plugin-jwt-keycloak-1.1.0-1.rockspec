@@ -23,13 +23,13 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["kong.plugins.jwt-keycloak.validators.issuers"] = "kong/plugins/validators/issuers.lua",
-    ["kong.plugins.jwt-keycloak.validators.roles"] = "kong/plugins/validators/roles.lua",
-    ["kong.plugins.jwt-keycloak.validators.scope"] = "kong/plugins/validators/scope.lua",
-    ["kong.plugins.jwt-keycloak.tardis.securitylog"] = "kong/plugins/tardis/securitylog.lua",
-    ["kong.plugins.jwt-keycloak.handler"] = "kong/plugins/handler.lua",
-    ["kong.plugins.jwt-keycloak.key_conversion"] = "kong/plugins/key_conversion.lua",
-    ["kong.plugins.jwt-keycloak.keycloak_keys"] = "kong/plugins/keycloak_keys.lua",
-    ["kong.plugins.jwt-keycloak.schema"]  = "kong/plugins/schema.lua",
+    ["kong.plugins.jwt-keycloak.validators.issuers"] = "kong/plugins/jwt-keycloak/validators/issuers.lua",
+    ["kong.plugins.jwt-keycloak.validators.roles"] = "kong/plugins/jwt-keycloak/validators/roles.lua",
+    ["kong.plugins.jwt-keycloak.validators.scope"] = "kong/plugins/jwt-keycloak/validators/scope.lua",
+    ["kong.plugins.jwt-keycloak.tardis.securitylog"] = "kong/plugins/jwt-keycloak/tardis/securitylog.lua",
+    ["kong.plugins.jwt-keycloak.handler"] = "kong/plugins/jwt-keycloak/handler.lua",
+    ["kong.plugins.jwt-keycloak.key_conversion"] = "kong/plugins/jwt-keycloak/key_conversion.lua",
+    ["kong.plugins.jwt-keycloak.keycloak_keys"] = "kong/plugins/jwt-keycloak/keycloak_keys.lua",
+    ["kong.plugins.jwt-keycloak.schema"]  = "kong/plugins/jwt-keycloak/schema.lua",
   }
 }
