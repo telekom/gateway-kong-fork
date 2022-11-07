@@ -18,9 +18,8 @@ local stream_available, stream_api = pcall(require, "kong.tools.stream_api")
 
 local role = kong.configuration.role
 
-local DEFAULT_BUCKETS = { 1, 2, 5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70,
-                          80, 90, 100, 200, 300, 400, 500, 1000,
-                          2000, 5000, 10000, 30000, 60000 }
+local DEFAULT_BUCKETS = { 1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
+
 local metrics = {}
 -- prometheus.lua instance
 local prometheus
@@ -102,10 +101,28 @@ local function init()
   metrics.bandwidth = prometheus:counter("bandwidth",
                                          "Total bandwidth in bytes " ..
                                          "consumed per service/route in Kong",
-                                         {"service", "route", "type"})
+                                         {"service", "route", "type"})                                   
+  --[[
   metrics.consumer_status = prometheus:counter("http_consumer_status",
                                           "HTTP status codes for customer per service/route in Kong",
                                           {"service", "route", "code", "consumer"})
+  --]]
+  -- eni
+  metrics.eni_status = prometheus:counter("eni_http_status",
+    "HTTP status codes for customer per route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "code"})
+
+  metrics.eni_latency = prometheus:histogram("eni_latency",
+    "Latency added by Kong, total " ..
+      "request time and upstream latency " ..
+      "for each route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "type"},
+    DEFAULT_BUCKETS)
+
+  metrics.eni_bandwidth = prometheus:counter("eni_bandwidth",
+    "Bandwidth in bytes " ..
+      "consumed per route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "type"})
 
   -- Hybrid mode status
   if role == "control_plane" then
@@ -149,7 +166,8 @@ end
 -- Since in the prometheus library we create a new table for each diverged label
 -- so putting the "more dynamic" label at the end will save us some memory
 local labels_table = {0, 0, 0}
-local labels_table4 = {0, 0, 0, 0}
+--local labels_table4 = {0, 0, 0, 0}
+local labels_tableEni = {0, 0, 0, 0, 0}
 local upstream_target_addr_health_table = {
   { value = 0, labels = { 0, 0, 0, "healthchecks_off", ngx.config.subsystem } },
   { value = 0, labels = { 0, 0, 0, "healthy", ngx.config.subsystem } },
@@ -226,7 +244,7 @@ if kong_subsystem == "http" then
       labels_table[3] = "kong"
       metrics.latency:observe(kong_proxy_latency, labels_table)
     end
-
+--[[ former enhancement for consumer
     if serialized.consumer ~= nil then
       labels_table4[1] = labels_table[1]
       labels_table4[2] = labels_table[2]
@@ -234,6 +252,39 @@ if kong_subsystem == "http" then
       labels_table4[4] = serialized.consumer
       metrics.consumer_status:inc(1, labels_table4)
     end
+--]]
+    --eni part start
+    if serialized.consumer then
+      labels_tableEni[1] = labels_table[2]
+      labels_tableEni[2] = serialized.method
+      labels_tableEni[3] = serialized.consumer
+      labels_tableEni[4] = serialized.customer_facing
+      labels_tableEni[5] = message.response.status
+      metrics.eni_status:inc(1, labels_tableEni)
+
+      if request_size and request_size > 0 then
+        labels_tableEni[5] = "ingress"
+        metrics.eni_bandwidth:inc(request_size, labels_tableEni)
+      end
+
+      if response_size and response_size > 0 then
+        labels_tableEni[5] = "egress"
+        metrics.eni_bandwidth:inc(response_size, labels_tableEni)
+      end
+
+      if request_latency and request_latency >= 0 then
+        labels_tableEni[5] = "request"
+        metrics.eni_latency:observe(request_latency, labels_tableEni)
+      end
+
+      if upstream_latency ~= nil and upstream_latency >= 0 then
+        labels_tableEni[5] = "upstream"
+        metrics.eni_latency:observe(upstream_latency, labels_tableEni)
+      end
+    end
+    --eni part end
+
+
   end
 
 else

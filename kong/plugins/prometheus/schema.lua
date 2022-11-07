@@ -13,7 +13,8 @@ return {
     { config = {
         type = "record",
         fields = {
-          { per_consumer = { type = "boolean", default = false }, },
+          { eni_stat = { type = "boolean", default = false }, },
+          { customer_facing = { type = "string", default = "false" }, },
         },
         custom_validator = validate_shared_dict,
     }, },
