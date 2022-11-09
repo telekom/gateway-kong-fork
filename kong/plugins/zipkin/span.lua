@@ -110,6 +110,14 @@ function span_methods:set_tag(key, value)
   return true
 end
 
+function span_methods:get_tag(key)
+  assert(type(key) == "string", "invalid tag key")
+  local tags = self.tags
+  if tags ~= nil then
+  return tags[key]
+  end
+  return nil
+end
 
 function span_methods:each_tag()
   local tags = self.tags

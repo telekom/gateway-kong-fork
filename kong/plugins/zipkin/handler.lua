@@ -8,6 +8,8 @@ local request_tags = require "kong.plugins.zipkin.request_tags"
 local subsystem = ngx.config.subsystem
 local fmt = string.format
 local rand_bytes = utils.get_rand_bytes
+local worker_id
+local worker_counter
 
 local ZipkinLogHandler = {
   VERSION = "1.5.0",
@@ -38,8 +40,8 @@ end
 local function get_reporter(conf)
   if reporter_cache[conf] == nil then
     reporter_cache[conf] = new_zipkin_reporter(conf.http_endpoint,
-                                               conf.default_service_name,
-                                               conf.local_service_name)
+                                               conf.local_component_name,
+                                               conf.default_service_name)
   end
   return reporter_cache[conf]
 end
@@ -49,23 +51,41 @@ local function tag_with_service_and_route(span)
   local service = kong.router.get_service()
   if service and service.id then
     span:set_tag("kong.service", service.id)
-    if type(service.name) == "string" then
-      span.service_name = service.name
-      span:set_tag("kong.service_name", service.name)
+
+    local tags = service.tags
+    local environment = ""
+
+    if tags then
+      for k, v in pairs(tags) do
+        if string.find(v, "environment") then
+          environment = string.gsub(v, "ei__telekom__de%-%-environment%-%-%-", "")
+        end
+      end
+      if environment then
+        span:set_tag("environment", environment)
     end
   end
 
   local route = kong.router.get_route()
-  if route then
-    if route.id then
+    if route and route.id then
       span:set_tag("kong.route", route.id)
     end
-    if type(route.name) == "string" then
-      span:set_tag("kong.route_name", route.name)
+    if type(service.name) == "string" then
+      span.service_name = service.name
     end
   end
 end
 
+local function copy_tardis_tags_to_child(parent, child)
+  local tardis_id = parent:get_tag("x-tardis-traceid")
+  if tardis_id then
+    child:set_tag("x-tardis-traceid", tardis_id)
+  end
+  local tardis_consumer_side = parent:get_tag("x-tardis-consumer-side")
+  if tardis_consumer_side then
+    child:set_tag("x-tardis-consumer-side", tardis_consumer_side)
+  end
+end
 
 -- adds the proxy span to the zipkin context, unless it already exists
 local function get_or_add_proxy_span(zipkin, timestamp)
@@ -76,6 +96,7 @@ local function get_or_add_proxy_span(zipkin, timestamp)
       request_span.name .. " (proxy)",
       timestamp
     )
+    copy_tardis_tags_to_child(request_span, zipkin.proxy_span)
   end
   return zipkin.proxy_span
 end
@@ -107,17 +128,28 @@ local function get_context(conf, ctx)
   return zipkin
 end
 
+local function starts_with(str, start)
+  return str:sub(1, #start) == start
+end
+
+local function get_tardis_id()
+  worker_counter = worker_counter + 1
+  return worker_id .. "#" .. worker_counter
+end
 
 if subsystem == "http" then
   initialize_request = function(conf, ctx)
     local req = kong.request
-
     local req_headers = req.get_headers()
+    local req_path = kong.request.get_path()
 
-    local header_type, trace_id, span_id, parent_id, should_sample, baggage =
-      tracing_headers.parse(req_headers, conf.header_type)
-
+    local header_type, trace_id, span_id, parent_id, should_sample, tardis_id, baggage =
+      tracing_headers.parse(req_headers)
     local method = req.get_method()
+
+    if starts_with(req_path, "/admin-api") then
+      should_sample = false
+    end
 
     if should_sample == nil then
       should_sample = math_random() < conf.sample_ratio
@@ -137,19 +169,20 @@ if subsystem == "http" then
       parent_id,
       baggage)
 
-    local http_version = req.get_http_version()
-    local protocol = http_version and 'HTTP/'..http_version or nil
+    if tardis_id == nil then
+      tardis_id = get_tardis_id()
+      request_span:set_tag("x-tardis-consumer-side", "true")
+    end
 
     request_span.ip = kong.client.get_forwarded_ip()
     request_span.port = kong.client.get_forwarded_port()
 
-    request_span:set_tag("lc", "kong")
+    local lc = conf.local_component_name or "kong"
+
+    request_span:set_tag("x-tardis-traceid", to_hex(tardis_id))
+    request_span:set_tag("lc", lc)
     request_span:set_tag("http.method", method)
-    request_span:set_tag("http.host", req.get_host())
     request_span:set_tag("http.path", req.get_path())
-    if protocol then
-      request_span:set_tag("http.protocol", protocol)
-    end
 
     local static_tags = conf.static_tags
     if type(static_tags) == "table" then
@@ -178,24 +211,29 @@ if subsystem == "http" then
     }
   end
 
+  function ZipkinLogHandler:init_worker()
+    worker_id = tracing_headers.from_hex(rand_bytes(10))
+    worker_counter = 0
+  end
+
 
   function ZipkinLogHandler:rewrite(conf) -- luacheck: ignore 212
-    local zipkin = get_context(conf, kong.ctx.plugin)
-    local ngx_ctx = ngx.ctx
+    local ctx = ngx.ctx
+    local zipkin = get_context(conf, ctx)
     -- note: rewrite is logged on the request_span, not on the proxy span
     local rewrite_start_mu =
-      ngx_ctx.KONG_REWRITE_START and ngx_ctx.KONG_REWRITE_START * 1000
+      ctx.KONG_REWRITE_START and ctx.KONG_REWRITE_START * 1000
       or ngx_now_mu()
     zipkin.request_span:annotate("krs", rewrite_start_mu)
   end
 
 
   function ZipkinLogHandler:access(conf) -- luacheck: ignore 212
-    local zipkin = get_context(conf, kong.ctx.plugin)
-    local ngx_ctx = ngx.ctx
+    local ctx = ngx.ctx
+    local zipkin = get_context(conf, ctx)
 
     local access_start =
-      ngx_ctx.KONG_ACCESS_START and ngx_ctx.KONG_ACCESS_START * 1000
+      ctx.KONG_ACCESS_START and ctx.KONG_ACCESS_START * 1000
       or ngx_now_mu()
     get_or_add_proxy_span(zipkin, access_start)
 
@@ -204,10 +242,10 @@ if subsystem == "http" then
 
 
   function ZipkinLogHandler:header_filter(conf) -- luacheck: ignore 212
-    local zipkin = get_context(conf, kong.ctx.plugin)
-    local ngx_ctx = ngx.ctx
+    local ctx = ngx.ctx
+    local zipkin = get_context(conf, ctx)
     local header_filter_start_mu =
-      ngx_ctx.KONG_HEADER_FILTER_STARTED_AT and ngx_ctx.KONG_HEADER_FILTER_STARTED_AT * 1000
+      ctx.KONG_HEADER_FILTER_STARTED_AT and ctx.KONG_HEADER_FILTER_STARTED_AT * 1000
       or ngx_now_mu()
 
     local proxy_span = get_or_add_proxy_span(zipkin, header_filter_start_mu)
@@ -216,7 +254,8 @@ if subsystem == "http" then
 
 
   function ZipkinLogHandler:body_filter(conf) -- luacheck: ignore 212
-    local zipkin = get_context(conf, kong.ctx.plugin)
+    local ctx = ngx.ctx
+    local zipkin = get_context(conf, ctx)
 
     -- Finish header filter when body filter starts
     if not zipkin.header_filter_finished then
@@ -229,7 +268,6 @@ if subsystem == "http" then
   end
 
 elseif subsystem == "stream" then
-
   initialize_request = function(conf, ctx)
     local request_span = new_span(
       "SERVER",
@@ -241,7 +279,9 @@ elseif subsystem == "stream" then
     request_span.ip = kong.client.get_forwarded_ip()
     request_span.port = kong.client.get_forwarded_port()
 
-    request_span:set_tag("lc", "kong")
+    local lc = conf.local_component_name or "kong"
+
+    request_span:set_tag("lc", lc)
 
     local static_tags = conf.static_tags
     if type(static_tags) == "table" then
@@ -259,10 +299,10 @@ elseif subsystem == "stream" then
 
 
   function ZipkinLogHandler:preread(conf) -- luacheck: ignore 212
-    local zipkin = get_context(conf, kong.ctx.plugin)
-    local ngx_ctx = ngx.ctx
+    local ctx = ngx.ctx
+    local zipkin = get_context(conf, ctx)
     local preread_start_mu =
-      ngx_ctx.KONG_PREREAD_START and ngx_ctx.KONG_PREREAD_START * 1000
+      ctx.KONG_PREREAD_START and ctx.KONG_PREREAD_START * 1000
       or ngx_now_mu()
 
     local proxy_span = get_or_add_proxy_span(zipkin, preread_start_mu)
@@ -273,19 +313,19 @@ end
 
 function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
   local now_mu = ngx_now_mu()
-  local zipkin = get_context(conf, kong.ctx.plugin)
-  local ngx_ctx = ngx.ctx
+  local ctx = ngx.ctx
+  local zipkin = get_context(conf, ctx)
   local request_span = zipkin.request_span
   local proxy_span = get_or_add_proxy_span(zipkin, now_mu)
   local reporter = get_reporter(conf)
 
   local proxy_finish_mu =
-    ngx_ctx.KONG_BODY_FILTER_ENDED_AT and ngx_ctx.KONG_BODY_FILTER_ENDED_AT * 1000
+    ctx.KONG_BODY_FILTER_ENDED_AT and ctx.KONG_BODY_FILTER_ENDED_AT * 1000
     or now_mu
 
-  if ngx_ctx.KONG_REWRITE_START and ngx_ctx.KONG_REWRITE_TIME then
+  if ctx.KONG_REWRITE_START and ctx.KONG_REWRITE_TIME then
     -- note: rewrite is logged on the request span, not on the proxy span
-    local rewrite_finish_mu = (ngx_ctx.KONG_REWRITE_START + ngx_ctx.KONG_REWRITE_TIME) * 1000
+    local rewrite_finish_mu = (ctx.KONG_REWRITE_START + ctx.KONG_REWRITE_TIME) * 1000
     zipkin.request_span:annotate("krf", rewrite_finish_mu)
   end
 
@@ -295,12 +335,12 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
     -- requests which are not matched by any route
     -- but we still want to know when the access phase "started"
     local access_start_mu =
-      ngx_ctx.KONG_ACCESS_START and ngx_ctx.KONG_ACCESS_START * 1000
+      ctx.KONG_ACCESS_START and ctx.KONG_ACCESS_START * 1000
       or proxy_span.timestamp
     proxy_span:annotate("kas", access_start_mu)
 
     local access_finish_mu =
-      ngx_ctx.KONG_ACCESS_ENDED_AT and ngx_ctx.KONG_ACCESS_ENDED_AT * 1000
+      ctx.KONG_ACCESS_ENDED_AT and ctx.KONG_ACCESS_ENDED_AT * 1000
       or proxy_finish_mu
     proxy_span:annotate("kaf", access_finish_mu)
 
@@ -313,12 +353,12 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
 
   else
     local preread_finish_mu =
-      ngx_ctx.KONG_PREREAD_ENDED_AT and ngx_ctx.KONG_PREREAD_ENDED_AT * 1000
+      ctx.KONG_PREREAD_ENDED_AT and ctx.KONG_PREREAD_ENDED_AT * 1000
       or proxy_finish_mu
     proxy_span:annotate("kpf", preread_finish_mu)
   end
 
-  local balancer_data = ngx_ctx.balancer_data
+  local balancer_data = ctx.balancer_data
   if balancer_data then
     local balancer_tries = balancer_data.tries
     for i = 1, balancer_data.try_count do
@@ -336,12 +376,9 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
       end
 
       tag_with_service_and_route(span)
+      copy_tardis_tags_to_child(request_span, span)
 
-      if try.balancer_latency ~= nil then
         span:finish((try.balancer_start + try.balancer_latency) * 1000)
-      else
-        span:finish(now_mu)
-      end
       reporter:report(span)
     end
     proxy_span:set_tag("peer.hostname", balancer_data.hostname) -- could be nil
@@ -352,11 +389,11 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
   if subsystem == "http" then
     request_span:set_tag("http.status_code", kong.response.get_status())
   end
-  if ngx_ctx.authenticated_consumer then
-    request_span:set_tag("kong.consumer", ngx_ctx.authenticated_consumer.id)
+  if ctx.authenticated_consumer then
+    request_span:set_tag("kong.consumer", ctx.authenticated_consumer.id)
   end
-  if conf.include_credential and ngx_ctx.authenticated_credential then
-    request_span:set_tag("kong.credential", ngx_ctx.authenticated_credential.id)
+  if conf.include_credential and ctx.authenticated_credential then
+    request_span:set_tag("kong.credential", ctx.authenticated_credential.id)
   end
   request_span:set_tag("kong.node.id", kong.node.get_id())
 
