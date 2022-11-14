@@ -19,8 +19,18 @@ function PrometheusHandler.log(self, conf)
   local message = kong.log.serialize()
 
   local serialized = {}
-  if conf.per_consumer and message.consumer ~= nil then
-    serialized.consumer = message.consumer.username
+  if conf.eni_stat then
+    if message.consumer ~= nil then
+      serialized.consumer = message.consumer.username
+    else
+      serialized.consumer = "anonymous"
+    end
+    if message.request and message.request.method ~= nil then
+      serialized.method = message.request.method
+    else
+      serialized.method = "default"
+    end
+    serialized.customer_facing = conf.customer_facing
   end
 
   prometheus.log(message, serialized)

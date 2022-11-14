@@ -414,6 +414,15 @@ build = {
     ["kong.plugins.acme.schema"] = "kong/plugins/acme/schema.lua",
     ["kong.plugins.acme.storage.kong"] = "kong/plugins/acme/storage/kong.lua",
 
+    ["kong.plugins.jwt-keycloak.validators.issuers"] = "kong/plugins/jwt-keycloak/validators/issuers.lua",
+    ["kong.plugins.jwt-keycloak.validators.roles"] = "kong/plugins/jwt-keycloak/validators/roles.lua",
+    ["kong.plugins.jwt-keycloak.validators.scope"] = "kong/plugins/jwt-keycloak/validators/scope.lua",
+    ["kong.plugins.jwt-keycloak.tardis.securitylog"] = "kong/plugins/jwt-keycloak/tardis/securitylog.lua",
+    ["kong.plugins.jwt-keycloak.handler"] = "kong/plugins/jwt-keycloak/handler.lua",
+    ["kong.plugins.jwt-keycloak.key_conversion"] = "kong/plugins/jwt-keycloak/key_conversion.lua",
+    ["kong.plugins.jwt-keycloak.keycloak_keys"] = "kong/plugins/jwt-keycloak/keycloak_keys.lua",
+    ["kong.plugins.jwt-keycloak.schema"]  = "kong/plugins/jwt-keycloak/schema.lua",
+
     ["kong.plugins.prometheus.api"] = "kong/plugins/prometheus/api.lua",
     ["kong.plugins.prometheus.status_api"] = "kong/plugins/prometheus/status_api.lua",
     ["kong.plugins.prometheus.exporter"] = "kong/plugins/prometheus/exporter.lua",
@@ -421,14 +430,6 @@ build = {
     ["kong.plugins.prometheus.prometheus"] = "kong/plugins/prometheus/prometheus.lua",
     ["kong.plugins.prometheus.serve"] = "kong/plugins/prometheus/serve.lua",
     ["kong.plugins.prometheus.schema"] = "kong/plugins/prometheus/schema.lua",
-
-    ["kong.plugins.eni-prometheus.api"] = "kong/plugins/eni-prometheus/api.lua",
-    ["kong.plugins.eni-prometheus.status_api"] = "kong/plugins/eni-prometheus/status_api.lua",
-    ["kong.plugins.eni-prometheus.exporter"] = "kong/plugins/eni-prometheus/exporter.lua",
-    ["kong.plugins.eni-prometheus.handler"] = "kong/plugins/eni-prometheus/handler.lua",
-    ["kong.plugins.eni-prometheus.prometheus"] = "kong/plugins/eni-prometheus/prometheus.lua",
-    ["kong.plugins.eni-prometheus.serve"] = "kong/plugins/eni-prometheus/serve.lua",
-    ["kong.plugins.eni-prometheus.schema"] = "kong/plugins/eni-prometheus/schema.lua",
 
     ["kong.plugins.session.handler"] = "kong/plugins/session/handler.lua",
     ["kong.plugins.session.schema"] = "kong/plugins/session/schema.lua",
