@@ -469,13 +469,6 @@ build = {
     ["kong.plugins.zipkin.schema"] = "kong/plugins/zipkin/schema.lua",
     ["kong.plugins.zipkin.request_tags"] = "kong/plugins/zipkin/request_tags.lua",
 
-    ["kong.plugins.eni-zipkin.handler"] = "kong/plugins/eni-zipkin/handler.lua",
-    ["kong.plugins.eni-zipkin.reporter"] = "kong/plugins/eni-zipkin/reporter.lua",
-    ["kong.plugins.eni-zipkin.span"] = "kong/plugins/eni-zipkin/span.lua",
-    ["kong.plugins.eni-zipkin.tracing_headers"] = "kong/plugins/eni-zipkin/tracing_headers.lua",
-    ["kong.plugins.eni-zipkin.schema"] = "kong/plugins/eni-zipkin/schema.lua",
-    ["kong.plugins.eni-zipkin.request_tags"] = "kong/plugins/eni-zipkin/request_tags.lua",
-
     ["kong.plugins.request-transformer.migrations.cassandra"] = "kong/plugins/request-transformer/migrations/cassandra.lua",
     ["kong.plugins.request-transformer.migrations.postgres"] = "kong/plugins/request-transformer/migrations/postgres.lua",
     ["kong.plugins.request-transformer.migrations.common"] = "kong/plugins/request-transformer/migrations/common.lua",
