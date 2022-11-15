@@ -6,7 +6,7 @@ include:
 
 variables:
   MTR_TARGET_IMAGE:   eni-kong
-  MTR_TARGET_TAG:     $CI_COMMIT_REF_NAME
+  MTR_TARGET_TAG:     2.8.1-alpine
 
 stages:
 - test
@@ -48,3 +48,4 @@ semgrep:
 build:image:
   extends: .docker:build:mtr-devops-internal-with-tardis-common-and-dependencies
   stage: dockerize
+  when: manual
