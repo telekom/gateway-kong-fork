@@ -83,7 +83,7 @@ function zipkin_reporter_methods:report(span)
     timestamp = span.timestamp,
     duration = span.duration,
     -- shared = nil, -- We don't use shared spans (server reuses client generated spanId)
-    localEndpoint = { serviceName = self.local_service_name },
+    localEndpoint = localEndpoint,
     remoteEndpoint = remoteEndpoint,
     tags = zipkin_tags,
     annotations = span.annotations,
