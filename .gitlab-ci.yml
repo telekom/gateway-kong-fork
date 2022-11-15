@@ -45,16 +45,6 @@ semgrep:
     reports:
       sast: gl-sast-report.json
 
-
 build:image:
-  extends: .docker:build:mtr-devops-common-with-dependencies
+  extends: .docker:build:mtr-devops-internal-with-tardis-common-and-dependencies
   stage: dockerize
-  when: manual
-  
-publish:image:
-  extends: .docker:mirror:mtr-devops-common-to-customer
-  stage: publish
-  when: manual
-  only:
-    - tags
-  dependencies: []
