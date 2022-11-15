@@ -415,7 +415,7 @@ local function parse(headers, conf_header_type)
   end
 
 
-  return header_type, trace_id, span_id, parent_id, should_sample,, tardis_id, baggage
+  return header_type, trace_id, span_id, parent_id, should_sample, tardis_id, baggage
 end
 
 
