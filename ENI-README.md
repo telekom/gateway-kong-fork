@@ -13,8 +13,9 @@ Release tags have a eni-x.x.x equivalent.
 Release branches should not require updates from remote.\
 Eni-master can be updated via merge from master. This way we keep changes from us included and simultaneously updated.
 
-## [Not verified] How to built hotfixes?
+**NOTE:** There are a lot of merge conflicts coming from 2.8.1 onwards master. This means we need to reapply our changes on eni-master in a later stage.
+
+## How to built hotfixes?
 There are two reasons to create a hotfix:
 1. If we have a bug in our code, we simply release e.g. eni-2.8.1.x version. Even if we break semver. \
-2. Bugfix-release from Kong: we simply create an eni-2.8.x version branch and add our changes to it.
-
+2. Bugfix-release from Kong: we simply create an eni-2.8.x version branch form eni-2.8.1 as source. Merge new changes into the new branch.
