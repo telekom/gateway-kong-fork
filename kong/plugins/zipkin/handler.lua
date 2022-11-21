@@ -3,6 +3,7 @@ local new_span = require "kong.plugins.zipkin.span".new
 local utils = require "kong.tools.utils"
 local tracing_headers = require "kong.plugins.zipkin.tracing_headers"
 local request_tags = require "kong.plugins.zipkin.request_tags"
+local to_hex = require "resty.string".to_hex
 
 
 local subsystem = ngx.config.subsystem
