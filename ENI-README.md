@@ -2,6 +2,8 @@
 
 This is a mirrored repository of [Kong](https://github.com/Kong/kong). All branches and commits are automatically replicated by Gitlab. **Do not edit any branches beside mentioned ones.**
 
+**NOTE** Always take care of the MTR_TARGET_TAG variable naming!
+
 ## How to edit/implement files?
 We want to implement and extend plugins to our needs. Therefore we need a way to implement our changes but maintain the ability to update changes from Kong.\
 Therefore we use the following approach: all edits are solely done in release/eni-prefixed branches.\
