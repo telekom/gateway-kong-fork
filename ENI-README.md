@@ -9,7 +9,7 @@ We want to implement and extend plugins to our needs. Therefore we need a way to
 Therefore we use the following approach: all edits are solely done in release/eni-prefixed branches.\
 
 This means master has a eni-master equivalent.\
-Releases have a eni-release/x.x.x.x equivalent and released as x.x.x.x.
+Releases have a eni-release/x.x.x.x equivalent and released as x.x.x.x. The final x indicates the ENI-Version.
 
 ## How to update our sources?
 Release branches should not require updates from remote.\
