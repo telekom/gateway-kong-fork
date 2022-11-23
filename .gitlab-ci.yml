@@ -6,7 +6,7 @@ include:
 
 variables:
   MTR_TARGET_IMAGE:   eni-kong
-  MTR_TARGET_TAG:     2.8.1-alpine
+  MTR_TARGET_TAG:     2.8.1.x
 
 stages:
 - test
