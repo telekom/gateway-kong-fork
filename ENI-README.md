@@ -11,6 +11,13 @@ Therefore we use the following approach: all edits are solely done in release/en
 This means master has a eni-master equivalent.\
 Releases have a eni-release/x.x.x.x equivalent and released as x.x.x.x. The final x indicates the ENI-Version.
 
+## Hot to build release?
+Create a release branch e.g. eni-release/2.8.1.4 from the eni-release/2.8.1.x branch. \
+Prepare a final release with setting MTR_TARGET_TAG to the proper image version, e.g. 2.8.1.4. \
+Create a tag with the release name, e.g. 2.8.1.4. \
+Build the image by triggering the build job. \
+Delete the eni-release/2.8.1.4 branch.
+
 ## How to update our sources?
 Release branches should not require updates from remote.\
 Eni-master can be updated via merge from master. This way we keep changes from us included and simultaneously updated.
