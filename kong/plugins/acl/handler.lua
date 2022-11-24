@@ -66,6 +66,9 @@ function ACLHandler:access(conf)
   if not consumer_id then
     local authenticated_groups = groups.get_authenticated_groups()
     if not authenticated_groups then
+      -- eni: log security event
+      ngx.var.sec_event_code="207"
+      ngx.var.sec_event_details="missing_subscription"
       if kong.client.get_credential() then
         return kong.response.error(403, "You cannot consume this service")
       end
@@ -103,6 +106,9 @@ function ACLHandler:access(conf)
           consumer_groups = EMPTY
 
         else
+          -- eni: log security event
+          ngx.var.sec_event_code="207"
+          ngx.var.sec_event_details="missing_subscription"
           if credential then
             return kong.response.error(403, "You cannot consume this service")
           end
@@ -125,6 +131,9 @@ function ACLHandler:access(conf)
   end
 
   if to_be_blocked == true then -- NOTE: we only catch the boolean here!
+          -- eni: log security event
+          ngx.var.sec_event_code="207"
+          ngx.var.sec_event_details="missing_subscription"
     return kong.response.error(403, "You cannot consume this service")
   end
 
