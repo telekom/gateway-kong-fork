@@ -346,19 +346,19 @@ local function do_authentication(conf)
     if ok then
         ok, err = validate_realm_roles(conf.realm_roles, jwt.claims)
     else
-        security_event(222, 'validate_scope_failed') -- TODO verify if 222 is correct
+        security_event(222, 'validate_scope_failed')
     end
 
     if ok then
         ok, err = validate_roles(conf.roles, jwt.claims)
     else
-        security_event(222, 'validate_realm_roles_failed') -- TODO verify if 222 is correct
+        security_event(222, 'validate_realm_roles_failed')
     end
 
     if ok then
         ok, err = validate_client_roles(conf.client_roles, jwt.claims)
     else
-        security_event(222, 'validate_roles_failed') -- TODO verify if 222 is correct
+        security_event(222, 'validate_roles_failed')
     end
 
     if ok then

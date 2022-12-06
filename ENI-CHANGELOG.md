@@ -3,6 +3,8 @@
 This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
+## 2.8.1.2
+ - JWT-Keycloak plugin: collect tardis data
 
 ## 2.8.1.1
  - JWT-Keycloak plugin: set tardis_consumer variable

@@ -13,6 +13,7 @@ local validate_client_roles = require("kong.plugins.jwt-keycloak.validators.role
 local re_gmatch = ngx.re.gmatch
 
 local security_event = require("kong.plugins.jwt-keycloak.tardis.securitylog").security_event
+local set_tardis_consumer = require("kong.plugins.jwt-keycloak.tardis.securitylog").collect_tardis_data
 
 local JwtKeycloakHandler = BasePlugin:extend()
 
@@ -183,12 +184,12 @@ end
 
 local function get_keys(well_known_endpoint)
     kong.log.debug('Getting public keys from keycloak')
-    keys, err = keycloak_keys.get_issuer_keys(well_known_endpoint)
+    local keys, err = keycloak_keys.get_issuer_keys(well_known_endpoint)
     if err then
         return nil, err
     end
 
-    decoded_keys = {}
+    local decoded_keys = {}
     for i, key in ipairs(keys) do
         decoded_keys[i] = jwt_decoder:base64_decode(key)
     end
@@ -203,7 +204,7 @@ end
 local function validate_signature(conf, jwt, second_call)
     local issuer_cache_key = 'issuer_keys_' .. jwt.claims.iss
 
-    well_known_endpoint = keycloak_keys.get_wellknown_endpoint(conf.well_known_template, jwt.claims.iss)
+    local well_known_endpoint = keycloak_keys.get_wellknown_endpoint(conf.well_known_template, jwt.claims.iss)
     -- Retrieve public keys
     local public_keys, err = kong.cache:get(issuer_cache_key, nil, get_keys, well_known_endpoint, true)
 
@@ -211,6 +212,7 @@ local function validate_signature(conf, jwt, second_call)
         if err then
             kong.log.err(err)
         end
+        security_event(221, 'public_key_not_available')
         return kong.response.exit(403, { message = "Unable to get public key for issuer" })
     end
 
@@ -230,6 +232,7 @@ local function validate_signature(conf, jwt, second_call)
         return validate_signature(conf, jwt, true)
     end
 
+    security_event(222, 'invalid_token_signature')
     return kong.response.exit(401, { message = "Invalid token signature" })
 end
 
@@ -238,10 +241,10 @@ local function match_consumer(conf, jwt)
     local consumer_id = jwt.claims[conf.consumer_match_claim]
 
     if conf.consumer_match_claim_custom_id then
-        consumer_cache_key = get_consumer_custom_id_cache_key(consumer_id)
+        local consumer_cache_key = get_consumer_custom_id_cache_key(consumer_id)
         consumer, err = kong.cache:get(consumer_cache_key, nil, load_consumer_by_custom_id, consumer_id, true)
     else
-        consumer_cache_key = kong.db.consumers:cache_key(consumer_id)
+        local consumer_cache_key = kong.db.consumers:cache_key(consumer_id)
         consumer, err = kong.cache:get(consumer_cache_key, nil, load_consumer, consumer_id, true)
     end
 
@@ -275,10 +278,10 @@ local function do_authentication(conf)
             security_event(200, 'token_not_provided')
             return false, { status = 401, message = "Unauthorized" }
         elseif token_type == "table" then
-            security_event(200, 'wrong_token_provided')
+            security_event(200, 'multiple_tokens_provided')
             return false, { status = 401, message = "Multiple tokens provided" }
         else
-            security_event(200, 'wrong_token_provided')
+            security_event(200, 'unrecognizable_token')
             return false, { status = 401, message = "Unrecognizable token" }
         end
     end
@@ -296,6 +299,7 @@ local function do_authentication(conf)
         return false, {status = 403, message = "Invalid algorithm"}
     end
 
+    set_tardis_consumer(jwt)
     -- Verify the JWT registered claims
     local ok_claims, errors = jwt:verify_registered_claims(conf.claims_to_verify)
     if not ok_claims then
@@ -315,53 +319,53 @@ local function do_authentication(conf)
     -- Verify that the issuer is allowed
     if not validate_issuer(conf.allowed_iss, jwt.claims) then
         -- TODO: dedicated security coden will be defined
-        security_event(210, 'incorrect_issuer')
+        security_event(222, 'incorrect_issuer')
         return false, { status = 401, message = "Token issuer not allowed" }
     end
 
     err = validate_signature(conf, jwt)
     if err ~= nil then
         -- TODO: dedicated security coden will be defined
-        security_event(211, 'incorrect_token_signature')
+        security_event(220, 'incorrect_token_signature')
         return false, err
     end
 
     -- Match consumer
     if conf.consumer_match then
-        ok, err = match_consumer(conf, jwt)
+        local ok, err = match_consumer(conf, jwt)
         if not ok then
-            security_event(207, 'consumer_match_failed')
+            security_event(207, 'consumer_match_failed') -- this case practically does not occur in the current rover configuration (because consumer_match not useed))
             return ok, err
         end
     end
 
     -- Verify roles or scopes
-    -- TODO: dedicated security coden will be defined
+    -- These cases currently don't occur, but may become important with the introduction of scopes
     local ok, err = validate_scope(conf.scope, jwt.claims)
 
     if ok then
         ok, err = validate_realm_roles(conf.realm_roles, jwt.claims)
     else
-        security_event(212, 'validate_scope_failed')
+        security_event(222, 'validate_scope_failed')
     end
 
     if ok then
         ok, err = validate_roles(conf.roles, jwt.claims)
     else
-        security_event(212, 'validate_realm_roles_failed')
+        security_event(222, 'validate_realm_roles_failed')
     end
 
     if ok then
         ok, err = validate_client_roles(conf.client_roles, jwt.claims)
     else
-        security_event(212, 'validate_roles_failed')
+        security_event(222, 'validate_roles_failed')
     end
 
     if ok then
         kong.ctx.shared.jwt_keycloak_token = jwt
         return true
     else
-        security_event(212, 'validate_client_roles_failed')
+        security_event(222, 'validate_client_roles_failed')
     end
 
     return false, { status = 403, message = "Access token does not have the required scope/role: " .. err }
