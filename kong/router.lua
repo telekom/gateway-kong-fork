@@ -239,17 +239,7 @@ do
 end
 
 
---[[
-Hypothesis
-----------
-
-Item size:        1024 bytes
-Max memory limit: 5 MiBs
-
-LRU size must be: (5 * 2^20) / 1024 = 5120
-Floored: 5000 items should be a good default
---]]
-local MATCH_LRUCACHE_SIZE = 5e3
+local DEFAULT_MATCH_LRUCACHE_SIZE = 5000
 
 
 local MATCH_RULES = {
@@ -504,7 +494,23 @@ local function marshall_route(r)
       for i = 1, count do
         local path = paths[i]
 
-        if re_find(path, [[[a-zA-Z0-9\.\-_~/%]*$]], "ajo") then
+        -- we are supporting boths 2.x route path and 3.0 route paths
+        -- for a path not starting with ~, we assume it is a 2.x route path
+        -- it's safe because even if it's a 3.0 prefix path, we can normalize a prefix path
+        -- more than once and get the same result
+        -- and for a path start with ~ we just do what 3.0 do
+        local is_prefix
+        local need_normalize = true
+        if path:sub(1, 1) == "~" then
+          is_prefix, need_normalize = false, false
+          path = normalize_regex(path:sub(2))
+
+
+        else
+          is_prefix = not not re_find(path, [[[a-zA-Z0-9\.\-_~/%]*$]], "ajo")
+        end
+
+        if is_prefix then
           -- plain URI or URI prefix
 
           local uri_t = {
@@ -517,9 +523,10 @@ local function marshall_route(r)
           max_uri_length = max(max_uri_length, #path)
 
         else
-          local path = normalize_regex(path)
-
           -- regex URI
+          if need_normalize then
+            path = normalize_regex(path)
+          end
           local strip_regex  = REGEX_PREFIX .. path .. [[(?<uri_postfix>.*)]]
 
           local uri_t    = {
@@ -1454,7 +1461,7 @@ local function find_match(ctx)
 end
 
 
-local _M = { MATCH_LRUCACHE_SIZE = MATCH_LRUCACHE_SIZE }
+local _M = { DEFAULT_MATCH_LRUCACHE_SIZE = DEFAULT_MATCH_LRUCACHE_SIZE }
 
 
 -- for unit-testing purposes only
@@ -1499,11 +1506,11 @@ function _M.new(routes, cache, cache_neg)
   local routes_by_id = {}
 
   if not cache then
-    cache = lrucache.new(MATCH_LRUCACHE_SIZE)
+    cache = lrucache.new(DEFAULT_MATCH_LRUCACHE_SIZE)
   end
 
   if not cache_neg then
-    cache_neg = lrucache.new(MATCH_LRUCACHE_SIZE)
+    cache_neg = lrucache.new(DEFAULT_MATCH_LRUCACHE_SIZE)
   end
 
   -- index routes
