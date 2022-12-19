@@ -61,7 +61,7 @@ local function init()
                                        "Kong Node metadata information",
                                        {"node_id", "version"},
                                        prometheus.LOCAL_STORAGE)
-  metrics.node_info:set(1, {node_id, kong.version})
+                                       metrics.node_info:set(1, {node_id, kong.version})
   -- only export upstream health metrics in traditional mode and data plane
   if role ~= "control_plane" then
     metrics.upstream_target_health = prometheus:gauge("upstream_target_health",
@@ -78,13 +78,13 @@ local function init()
                                              {"node_id", "pid", "kong_subsystem"},
                                              prometheus.LOCAL_STORAGE)
   memory_stats.shms = prometheus:gauge("memory_lua_shared_dict_bytes",
-                                             "Allocated slabs in bytes in a shared_dict",
-                                             {"node_id", "shared_dict", "kong_subsystem"},
-                                             prometheus.LOCAL_STORAGE)
-  memory_stats.shm_capacity = prometheus:gauge("memory_lua_shared_dict_total_bytes",
-                                                     "Total capacity in bytes of a shared_dict",
-                                                     {"node_id", "shared_dict", "kong_subsystem"},
-                                                     prometheus.LOCAL_STORAGE)
+                                       "Allocated slabs in bytes in a shared_dict",
+                                       {"node_id", "shared_dict", "kong_subsystem"},
+                                       prometheus.LOCAL_STORAGE)
+memory_stats.shm_capacity = prometheus:gauge("memory_lua_shared_dict_total_bytes",
+                                               "Total capacity in bytes of a shared_dict",
+                                               {"node_id", "shared_dict", "kong_subsystem"},
+                                               prometheus.LOCAL_STORAGE)
 
   local res = kong.node.get_memory_stats()
   for shm_name, value in pairs(res.lua_shared_dicts) do
@@ -141,6 +141,23 @@ local function init()
                                           {"service", "route", "direction"})
   end
 
+  -- eni
+  metrics.eni_status = prometheus:counter("eni_http_status",
+    "HTTP status codes for customer per route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "code"})
+
+  metrics.eni_latency = prometheus:histogram("eni_latency",
+    "Latency added by Kong, total " ..
+      "request time and upstream latency " ..
+      "for each route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "type"},
+    KONG_LATENCY_BUCKETS)
+
+  metrics.eni_bandwidth = prometheus:counter("eni_bandwidth",
+    "Bandwidth in bytes " ..
+      "consumed per route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "type"})
+
   -- Hybrid mode status
   if role == "control_plane" then
     metrics.data_plane_last_seen = prometheus:gauge("data_plane_last_seen",
@@ -190,6 +207,7 @@ end
 local labels_table_bandwidth = {0, 0, 0, 0}
 local labels_table_status = {0, 0, 0, 0, 0}
 local labels_table_latency = {0, 0}
+local labels_tableEni = {0, 0, 0, 0, 0}
 local upstream_target_addr_health_table = {
   { value = 0, labels = { 0, 0, 0, "healthchecks_off", ngx.config.subsystem } },
   { value = 0, labels = { 0, 0, 0, "healthy", ngx.config.subsystem } },
@@ -298,6 +316,38 @@ local function log(message, serialized)
     if kong_proxy_latency ~= nil and kong_proxy_latency >= 0 then
       metrics.kong_latency:observe(kong_proxy_latency, labels_table_latency)
     end
+
+        --eni part start
+    if serialized.consumer then
+      labels_tableEni[1] = labels_table[2]
+      labels_tableEni[2] = serialized.method
+      labels_tableEni[3] = serialized.consumer
+      labels_tableEni[4] = serialized.customer_facing
+      labels_tableEni[5] = message.response.status
+      metrics.eni_status:inc(1, labels_tableEni)
+
+      if request_size and request_size > 0 then
+        labels_tableEni[5] = "ingress"
+        metrics.eni_bandwidth:inc(request_size, labels_tableEni)
+      end
+
+      if response_size and response_size > 0 then
+        labels_tableEni[5] = "egress"
+        metrics.eni_bandwidth:inc(response_size, labels_tableEni)
+      end
+
+      if request_latency and request_latency >= 0 then
+        labels_tableEni[5] = "request"
+        metrics.eni_latency:observe(request_latency, labels_tableEni)
+      end
+
+      if upstream_latency ~= nil and upstream_latency >= 0 then
+        labels_tableEni[5] = "upstream"
+        metrics.eni_latency:observe(upstream_latency, labels_tableEni)
+      end
+    end
+    --eni part end
+
   end
 end
 
@@ -343,7 +393,7 @@ local function metric_data(write_fn)
     else
       metrics.db_reachable:set(0)
       kong.log.err("prometheus: failed to reach database while processing",
-                  "/metrics endpoint: ", err)
+                 "/metrics endpoint: ", err)
     end
   end
 
@@ -389,7 +439,7 @@ local function metric_data(write_fn)
   end
   for i = 1, #res.workers_lua_vms do
     metrics.memory_stats.worker_vms:set(res.workers_lua_vms[i].http_allocated_gc,
-                                        { node_id, res.workers_lua_vms[i].pid, kong_subsystem })
+    { node_id, res.workers_lua_vms[i].pid, kong_subsystem })
   end
 
   -- Hybrid mode status
