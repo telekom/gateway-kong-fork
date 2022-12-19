@@ -6,7 +6,7 @@ include:
 
 variables:
   MTR_TARGET_IMAGE:   eni-kong
-  MTR_TARGET_TAG:     2.8.3.x
+  MTR_TARGET_TAG:     2.8.3.x-prometheus
 
 stages:
 - test
