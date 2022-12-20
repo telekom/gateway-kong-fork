@@ -6,7 +6,8 @@ include:
 
 variables:
   MTR_TARGET_IMAGE:   eni-kong
-  MTR_TARGET_TAG:     2.8.3.x
+  MTR_TARGET_TAG:     $CI_COMMIT_REF_NAME
+  TAG_SED_REGEX:      's,^.*/,,'
 
 stages:
 - test
