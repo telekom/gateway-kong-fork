@@ -369,6 +369,28 @@ local function metric_data(write_fn)
   end
 
 -- eni - temporary commented out for testing
+-- eni - old code inserted for backward compatibility
+  if ngx.location then
+    local r = ngx.location.capture "/nginx_status"
+
+    if r.status ~= 200 then
+      kong.log.warn("prometheus: failed to retrieve /nginx_status ",
+        "while processing /metrics endpoint")
+
+    else
+      local accepted, handled, total = select(3, find(r.body,
+        "accepts handled requests\n (%d*) (%d*) (%d*)"))
+      metrics.connections:set(accepted, { "accepted" })
+      metrics.connections:set(handled, { "handled" })
+      metrics.connections:set(total, { "total" })
+    end
+  end
+
+  metrics.connections:set(ngx.var.connections_active or 0, { "active" })
+  metrics.connections:set(ngx.var.connections_reading or 0, { "reading" })
+  metrics.connections:set(ngx.var.connections_writing or 0, { "writing" })
+  metrics.connections:set(ngx.var.connections_waiting or 0, { "waiting" })
+
 --  local nginx_statistics = kong.nginx.get_statistics()
 --  metrics.connections:set(nginx_statistics['connections_accepted'], { node_id, kong_subsystem, "accepted" })
 --  metrics.connections:set(nginx_statistics['connections_handled'], { node_id, kong_subsystem, "handled" })
