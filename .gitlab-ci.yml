@@ -49,4 +49,3 @@ semgrep:
 build:image:
   extends: .docker:build:mtr-devops-internal-with-tardis-common-and-dependencies
   stage: dockerize
-  when: manual
