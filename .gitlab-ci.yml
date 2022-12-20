@@ -1,12 +1,13 @@
 include:
   - project: 'dhei/teams/io/templates/gitlab-pipelines'
     file: '/docker/gitlab-ci.docker.yml'
-    ref: regexp_patch
+    ref: develop
   - template: Security/Dependency-Scanning.gitlab-ci.yml
 
 variables:
   MTR_TARGET_IMAGE:   eni-kong
-  MTR_TARGET_TAG:     2.8.3.x-prometheus
+  MTR_TARGET_TAG:     $CI_COMMIT_REF_NAME
+  TAG_SED_REGEX:      's,^.*/,,'
 
 stages:
 - test
