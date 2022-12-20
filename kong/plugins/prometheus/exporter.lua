@@ -368,18 +368,19 @@ local function metric_data(write_fn)
     return kong.response.exit(500, { message = "An unexpected error occurred" })
   end
 
-  local nginx_statistics = kong.nginx.get_statistics()
-  metrics.connections:set(nginx_statistics['connections_accepted'], { node_id, kong_subsystem, "accepted" })
-  metrics.connections:set(nginx_statistics['connections_handled'], { node_id, kong_subsystem, "handled" })
-  metrics.connections:set(nginx_statistics['total_requests'], { node_id, kong_subsystem, "total" })
-  metrics.connections:set(nginx_statistics['connections_active'], { node_id, kong_subsystem, "active" })
-  metrics.connections:set(nginx_statistics['connections_reading'], { node_id, kong_subsystem, "reading" })
-  metrics.connections:set(nginx_statistics['connections_writing'], { node_id, kong_subsystem, "writing" })
-  metrics.connections:set(nginx_statistics['connections_waiting'], { node_id, kong_subsystem,"waiting" })
-  metrics.connections:set(nginx_statistics['connections_accepted'], { node_id, kong_subsystem, "accepted" })
-  metrics.connections:set(nginx_statistics['connections_handled'], { node_id, kong_subsystem, "handled" })
+-- eni - temporary commented out for testing
+--  local nginx_statistics = kong.nginx.get_statistics()
+--  metrics.connections:set(nginx_statistics['connections_accepted'], { node_id, kong_subsystem, "accepted" })
+--  metrics.connections:set(nginx_statistics['connections_handled'], { node_id, kong_subsystem, "handled" })
+--  metrics.connections:set(nginx_statistics['total_requests'], { node_id, kong_subsystem, "total" })
+--  metrics.connections:set(nginx_statistics['connections_active'], { node_id, kong_subsystem, "active" })
+--  metrics.connections:set(nginx_statistics['connections_reading'], { node_id, kong_subsystem, "reading" })
+--  metrics.connections:set(nginx_statistics['connections_writing'], { node_id, kong_subsystem, "writing" })
+--  metrics.connections:set(nginx_statistics['connections_waiting'], { node_id, kong_subsystem,"waiting" })
+--  metrics.connections:set(nginx_statistics['connections_accepted'], { node_id, kong_subsystem, "accepted" })
+--  metrics.connections:set(nginx_statistics['connections_handled'], { node_id, kong_subsystem, "handled" })
 
-  metrics.nginx_requests_total:set(nginx_statistics['total_requests'], { node_id, kong_subsystem })
+--  metrics.nginx_requests_total:set(nginx_statistics['total_requests'], { node_id, kong_subsystem })
 
   if http_subsystem then -- only export those metrics once in http as they are shared
     metrics.timers:set(ngx_timer_running_count(), {"running"})
