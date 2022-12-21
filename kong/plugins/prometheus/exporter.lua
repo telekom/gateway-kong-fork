@@ -320,7 +320,7 @@ local function log(message, serialized)
 
         --eni part start
     if serialized.consumer then
-      labels_tableEni[1] = labels_table[2]
+      labels_tableEni[1] = labels_table_status[2]
       labels_tableEni[2] = serialized.method
       labels_tableEni[3] = serialized.consumer
       labels_tableEni[4] = serialized.customer_facing
