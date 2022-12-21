@@ -1,5 +1,6 @@
 local kong = kong
 local ngx = ngx
+local find = string.find
 local lower = string.lower
 local concat = table.concat
 local ngx_timer_pending_count = ngx.timer.pending_count
