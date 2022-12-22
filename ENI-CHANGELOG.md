@@ -3,6 +3,10 @@
 This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
+## 2.8.3.1
+ - Updated Prometheus plugin to version from Kong 3.1.1
+ - ENI version indicator added to Kong version creation
+
 ## 2.8.3.0
  - Updated Kong to 2.8.3
 

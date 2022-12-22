@@ -1,64 +1,9 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__elements": [],
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "8.4.5"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph (old)",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "heatmap",
-      "name": "Heatmap",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table-old",
-      "name": "Table (old)",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
         "builtIn": 1,
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "VictoriaMetrics",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -69,16 +14,15 @@
   },
   "description": "Dashboard that graphs metrics exported via Prometheus plugin in Kong (http://github.com/kong/kong)",
   "editable": true,
-  "fiscalYearStartMonth": 0,
   "gnetId": 7424,
   "graphTooltip": 0,
-  "id": null,
-  "iteration": 1662693484232,
+  "id": 157,
+  "iteration": 1671549570584,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
-      "collapsed": true,
+      "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -86,176 +30,175 @@
         "y": 0
       },
       "id": 53,
-      "panels": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "max": 100,
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 1
-          },
-          "id": 22,
-          "options": {
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "mean"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true,
-            "text": {}
-          },
-          "pluginVersion": "8.4.5",
-          "repeat": "instance",
-          "repeatDirection": "v",
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "(kong_memory_lua_shared_dict_bytes{instance=~\"$instance\",shared_dict!~\"kong_process_events\"}/kong_memory_lua_shared_dict_total_bytes{instance=~\"$instance\",shared_dict!~\"kong_process_events\"})*100",
-              "format": "time_series",
-              "instant": false,
-              "interval": "",
-              "legendFormat": "{{shared_dict}} ({{kong_subsystem}})",
-              "refId": "A"
-            }
-          ],
-          "title": "Kong shared memory usage by Node ($instance)",
-          "type": "gauge"
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 6,
-            "w": 24,
-            "x": 0,
-            "y": 7
-          },
-          "hiddenSeries": false,
-          "id": 43,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "8.4.5",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "repeat": "instance",
-          "repeatDirection": "v",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "kong_memory_workers_lua_vms_bytes{instance=~\"$instance\"}",
-              "format": "time_series",
-              "instant": false,
-              "interval": "",
-              "legendFormat": "PID:{{pid}} ({{kong_subsystem}})",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeRegions": [],
-          "title": "Kong worker Lua VM usage by Node ($instance)",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "bytes",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "format": "bytes",
-              "logBase": 1,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false
-          }
-        }
-      ],
+      "panels": [],
       "title": "Caching",
       "type": "row"
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 22,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.1.2",
+      "repeat": "pod",
+      "repeatDirection": "v",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "(kong_memory_lua_shared_dict_bytes{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\",shared_dict!~\"kong_process_events\"}/kong_memory_lua_shared_dict_total_bytes{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\",shared_dict!~\"kong_process_events\"})*100",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{shared_dict}} ({{kong_subsystem}})",
+          "refId": "A"
+        }
+      ],
+      "title": "Kong shared memory usage by Node ($pod)",
+      "type": "gauge"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "hiddenSeries": false,
+      "id": 43,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "repeat": "pod",
+      "repeatDirection": "v",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "kong_memory_workers_lua_vms_bytes{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "PID:{{pid}} ({{kong_subsystem}})",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Kong worker Lua VM usage by Node ($pod)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "bytes",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
       "collapsed": true,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 1
+        "y": 25
       },
       "id": 51,
       "panels": [
@@ -264,6 +207,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -276,7 +220,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 14
+            "y": 2
           },
           "hiddenSeries": false,
           "id": 17,
@@ -298,7 +242,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -310,10 +254,10 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
               "exemplar": true,
-              "expr": "sum(kong_nginx_connections_total{state=~\"active|reading|writing|waiting\", instance=~\"$instance\"}) by (state)",
+              "expr": "sum(kong_nginx_connections_total{state=~\"active|reading|writing|waiting\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}) by (state)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -322,7 +266,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Nginx connection state",
           "tooltip": {
             "shared": true,
@@ -331,7 +277,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -352,10 +300,7 @@
           }
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -377,7 +322,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -393,7 +339,7 @@
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 21
+            "y": 9
           },
           "id": 18,
           "links": [],
@@ -410,13 +356,14 @@
               "fields": "",
               "values": false
             },
+            "text": {},
             "textMode": "auto"
           },
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "targets": [
             {
               "exemplar": true,
-              "expr": "sum(kong_nginx_connections_total{state=\"total\", instance=~\"$instance\"})",
+              "expr": "sum(kong_nginx_connections_total{state=\"total\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"})",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -428,10 +375,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -453,7 +397,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -469,7 +414,7 @@
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 21
+            "y": 9
           },
           "id": 19,
           "links": [],
@@ -486,12 +431,13 @@
               "fields": "",
               "values": false
             },
+            "text": {},
             "textMode": "auto"
           },
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "targets": [
             {
-              "expr": "sum(kong_nginx_connections_total{state=\"handled\", instance=~\"$instance\"})",
+              "expr": "sum(kong_nginx_connections_total{state=\"handled\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Handled",
@@ -502,10 +448,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -527,7 +470,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -543,7 +487,7 @@
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 21
+            "y": 9
           },
           "id": 20,
           "links": [],
@@ -560,12 +504,13 @@
               "fields": "",
               "values": false
             },
+            "text": {},
             "textMode": "auto"
           },
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "targets": [
             {
-              "expr": "sum(kong_nginx_connections_total{state=\"accepted\", instance=~\"$instance\"})",
+              "expr": "sum(kong_nginx_connections_total{state=\"accepted\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"})",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Accepted",
@@ -580,320 +525,324 @@
       "type": "row"
     },
     {
-      "collapsed": true,
+      "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "VictoriaMetrics"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 2
+        "y": 26
       },
       "id": 38,
-      "panels": [
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 7,
-            "w": 24,
-            "x": 0,
-            "y": 29
-          },
-          "hiddenSeries": false,
-          "id": 1,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "paceLength": 10,
-          "percentage": false,
-          "pluginVersion": "8.4.5",
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "sum(rate(kong_http_requests_total{instance=~\"$instance\"}[1m]))",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "Requests/second",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeRegions": [],
-          "title": "Total requests per second (RPS)",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "format": "s",
-              "logBase": 1,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 7,
-            "w": 24,
-            "x": 0,
-            "y": 36
-          },
-          "hiddenSeries": false,
-          "id": 16,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "paceLength": 10,
-          "percentage": false,
-          "pluginVersion": "8.4.5",
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", instance=~\"$instance\"}[1m])) by (service)",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "service:{{service}}",
-              "refId": "A"
-            },
-            {
-              "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", instance=~\"$instance\"}[1m])) by (route)",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "route:{{route}}",
-              "refId": "B"
-            }
-          ],
-          "thresholds": [],
-          "timeRegions": [],
-          "title": "RPS per route/service ($service)",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 7,
-            "w": 24,
-            "x": 0,
-            "y": 43
-          },
-          "hiddenSeries": false,
-          "id": 39,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "paceLength": 10,
-          "percentage": false,
-          "pluginVersion": "8.4.5",
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", instance=~\"$instance\"}[1m])) by (service,code)",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "service:{{service}}-{{code}}",
-              "refId": "A"
-            },
-            {
-              "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", instance=~\"$instance\"}[1m])) by (route,code)",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "route:{{route}}-{{code}}",
-              "refId": "B"
-            }
-          ],
-          "thresholds": [],
-          "timeRegions": [],
-          "title": "RPS per route/service by status code",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false
-          }
-        }
-      ],
+      "panels": [],
       "title": "Request rate (Need to set config.status_code_metrics, it will cause performance impact)",
       "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "hiddenSeries": false,
+      "id": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "paceLength": 10,
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "kong_http_requests_total{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 2,
+          "legendFormat": "Requests/second",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Total requests per second (RPS)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "s",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "hiddenSeries": false,
+      "id": 16,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "paceLength": 10,
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service)",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "service:{{service}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route)",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "route:{{route}}",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "RPS per route/service ($service)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "hiddenSeries": false,
+      "id": 39,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "paceLength": 10,
+      "percentage": false,
+      "pluginVersion": "8.1.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,code)",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "service:{{service}}-{{code}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(kong_http_requests_total{service=~\"$service\", route=~\"$route\", clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,code)",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "route:{{route}}-{{code}}",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "RPS per route/service by status code",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
     },
     {
       "collapsed": true,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "VictoriaMetrics"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 48
       },
       "id": 36,
       "panels": [
@@ -902,10 +851,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -918,7 +864,7 @@
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 51
+            "y": 4
           },
           "hiddenSeries": false,
           "id": 10,
@@ -940,7 +886,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -950,21 +896,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.90, sum(rate(kong_kong_latency_ms_bucket{instance=~\"$instance\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_kong_latency_ms_bucket{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p90",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, sum(rate(kong_kong_latency_ms_bucket{instance=~\"$instance\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_kong_latency_ms_bucket{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, sum(rate(kong_kong_latency_ms_bucket{instance=~\"$instance\"}[1m])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_kong_latency_ms_bucket{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99",
@@ -972,7 +918,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Kong Proxy Latency across all services",
           "tooltip": {
             "shared": true,
@@ -981,7 +929,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1006,6 +956,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1018,7 +969,7 @@
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 51
+            "y": 4
           },
           "hiddenSeries": false,
           "id": 11,
@@ -1040,7 +991,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1052,10 +1003,10 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
               "exemplar": true,
-              "expr": "histogram_quantile(0.90, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -1065,9 +1016,9 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
-              "expr": "histogram_quantile(0.95, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95-{{service}}",
@@ -1076,9 +1027,9 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
-              "expr": "histogram_quantile(0.99, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99-{{service}}",
@@ -1086,7 +1037,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Kong Proxy Latency per Service",
           "tooltip": {
             "shared": true,
@@ -1095,7 +1048,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1120,10 +1075,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1136,7 +1088,7 @@
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 51
+            "y": 4
           },
           "hiddenSeries": false,
           "id": 42,
@@ -1158,7 +1110,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1168,21 +1120,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.90, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p90-{{route}}",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95-{{route}}",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_kong_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99-{{route}}",
@@ -1190,7 +1142,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Kong Proxy Latency per Route",
           "tooltip": {
             "shared": true,
@@ -1199,7 +1153,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1224,10 +1180,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1240,7 +1193,7 @@
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 58
+            "y": 11
           },
           "hiddenSeries": false,
           "id": 12,
@@ -1262,7 +1215,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1294,7 +1247,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Request Time across all services",
           "tooltip": {
             "shared": true,
@@ -1303,7 +1258,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1328,10 +1285,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1344,7 +1298,7 @@
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 58
+            "y": 11
           },
           "hiddenSeries": false,
           "id": 13,
@@ -1366,7 +1320,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1376,21 +1330,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.90, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p90-{{service}}",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95-{{service}}",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99-{{service}}",
@@ -1398,7 +1352,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Request Time per service",
           "tooltip": {
             "shared": true,
@@ -1407,7 +1363,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1432,10 +1390,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1448,7 +1403,7 @@
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 58
+            "y": 11
           },
           "hiddenSeries": false,
           "id": 41,
@@ -1470,7 +1425,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1480,21 +1435,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.90, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p90-{{route}}",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95-{{route}}",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_request_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99-{{route}}",
@@ -1502,7 +1457,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Request Time per Route",
           "tooltip": {
             "shared": true,
@@ -1511,7 +1468,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1536,10 +1495,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1552,7 +1508,7 @@
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 65
+            "y": 18
           },
           "height": "250",
           "hiddenSeries": false,
@@ -1575,7 +1531,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1608,7 +1564,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Upstream time across all services",
           "tooltip": {
             "shared": true,
@@ -1617,7 +1575,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1642,10 +1602,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1658,7 +1615,7 @@
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 65
+            "y": 18
           },
           "height": "250",
           "hiddenSeries": false,
@@ -1681,7 +1638,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1691,7 +1648,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.90, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -1699,14 +1656,14 @@
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95-{{service}}",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service,le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99-{{service}}",
@@ -1714,7 +1671,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Upstream Time across per service",
           "tooltip": {
             "shared": true,
@@ -1723,7 +1682,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1748,10 +1709,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1764,7 +1722,7 @@
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 65
+            "y": 18
           },
           "height": "250",
           "hiddenSeries": false,
@@ -1787,7 +1745,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1797,7 +1755,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.90, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.90, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -1805,14 +1763,14 @@
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.95, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.95, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p95-{{route}}",
               "refId": "B"
             },
             {
-              "expr": "histogram_quantile(0.99, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route,le))",
+              "expr": "histogram_quantile(0.99, sum(rate(kong_upstream_latency_ms_bucket{service =~ \"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route,le))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "p99-{{route}}",
@@ -1820,7 +1778,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Upstream Time across per Route",
           "tooltip": {
             "shared": true,
@@ -1829,7 +1789,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1857,13 +1819,13 @@
       "collapsed": true,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "VictoriaMetrics"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 4
+        "y": 49
       },
       "id": 34,
       "panels": [
@@ -1872,6 +1834,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1884,7 +1847,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 73
+            "y": 5
           },
           "hiddenSeries": false,
           "id": 3,
@@ -1908,7 +1871,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -1920,10 +1883,10 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
               "exemplar": true,
-              "expr": "sum(irate(kong_bandwidth_bytes{instance=~\"$instance\"}[1m])) by (type)",
+              "expr": "sum(irate(kong_bandwidth_bytes{clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (type)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -1932,7 +1895,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Total Bandwidth",
           "tooltip": {
             "shared": true,
@@ -1941,7 +1906,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -1966,10 +1933,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1982,7 +1946,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 80
+            "y": 12
           },
           "hiddenSeries": false,
           "id": 2,
@@ -2004,7 +1968,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -2014,14 +1978,14 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(irate(kong_bandwidth_bytes{direction=\"egress\", service =~\"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (service)",
+              "expr": "sum(irate(kong_bandwidth_bytes{direction=\"egress\", service =~\"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (service)",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "service:{{service}}",
               "refId": "A"
             },
             {
-              "expr": "sum(irate(kong_bandwidth_bytes{direction=\"egress\", service =~\"$service\",route=~\"$route\",instance=~\"$instance\"}[1m])) by (route)",
+              "expr": "sum(irate(kong_bandwidth_bytes{direction=\"egress\", service =~\"$service\",route=~\"$route\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"}[1m])) by (route)",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "route:{{route}}",
@@ -2029,7 +1993,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Egress per service/route",
           "tooltip": {
             "shared": true,
@@ -2038,7 +2004,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -2063,10 +2031,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
+          "datasource": null,
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -2079,7 +2044,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 80
+            "y": 12
           },
           "hiddenSeries": false,
           "id": 9,
@@ -2101,7 +2066,7 @@
           },
           "paceLength": 10,
           "percentage": false,
-          "pluginVersion": "8.4.5",
+          "pluginVersion": "8.1.2",
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -2119,7 +2084,9 @@
             }
           ],
           "thresholds": [],
+          "timeFrom": null,
           "timeRegions": [],
+          "timeShift": null,
           "title": "Ingress per service/route",
           "tooltip": {
             "shared": true,
@@ -2128,7 +2095,9 @@
           },
           "type": "graph",
           "xaxis": {
+            "buckets": null,
             "mode": "time",
+            "name": null,
             "show": true,
             "values": []
           },
@@ -2156,18 +2125,21 @@
       "collapsed": true,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "VictoriaMetrics"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 50
       },
       "id": 45,
       "panels": [
         {
-          "cards": {},
+          "cards": {
+            "cardPadding": null,
+            "cardRound": null
+          },
           "color": {
             "cardColor": "#b4ff00",
             "colorScale": "sqrt",
@@ -2176,11 +2148,12 @@
             "mode": "spectrum"
           },
           "dataFormat": "tsbuckets",
+          "datasource": null,
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 88
+            "y": 6
           },
           "heatmap": {},
           "hideZeroBuckets": false,
@@ -2195,7 +2168,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
               "exemplar": true,
               "expr": "sum(kong_upstream_target_health{state=\"healthy\",upstream=~\"$upstream\"}) by (upstream,target,address) * -1  + sum(kong_upstream_target_health{state=~\"(unhealthy|dns_error)\",upstream=~\"$upstream\"}) by (upstream,target,address)",
@@ -2222,27 +2195,37 @@
           "xAxis": {
             "show": true
           },
+          "xBucketNumber": null,
+          "xBucketSize": null,
           "yAxis": {
+            "decimals": null,
             "format": "short",
             "logBase": 1,
-            "show": true
+            "max": null,
+            "min": null,
+            "show": true,
+            "splitFactor": null
           },
-          "yBucketBound": "auto"
+          "yBucketBound": "auto",
+          "yBucketNumber": null,
+          "yBucketSize": null
         },
         {
           "columns": [],
+          "datasource": null,
           "fontSize": "100%",
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 88
+            "y": 6
           },
           "id": 47,
           "options": {
             "frameIndex": 0,
             "showHeader": true
           },
+          "pageSize": null,
           "pluginVersion": "7.5.4",
           "showHeader": true,
           "sort": {
@@ -2337,7 +2320,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "VictoriaMetrics"
               },
               "exemplar": false,
               "expr": "sum(\n# map state to a numeric value\n# since grafana doesn't support value mapping yet\n  label_replace(\n    label_replace(\n      label_replace(\n       kong_upstream_target_health{upstream=~\"$upstream\"}\n       # healthy is positive number\n       , \"state_value\", \"1\", \"state\", \"healthy\"\n       # healthchecks_off is 0\n      ), \"state_value\", \"0\", \"state\", \"healthchecks_off\"\n      # unhealthy is negative number\n    ), \"state_value\", \"-1\", \"state\", \"(dns_error|unhealthy)\"\n  )\n)\nby (upstream, target, address, state, state_value) > 0",
@@ -2382,27 +2365,136 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 35,
+  "schemaVersion": 30,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
       {
-        "allValue": ".*",
-        "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": [
+            "prod-stage-system"
+          ],
+          "value": [
+            "prod-stage-system"
+          ]
         },
-        "definition": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\"},service)",
+        "datasource": null,
+        "definition": "label_values({__name__=~\"^kong.*\"},clusterID)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
-        "label": "",
+        "label": "clusterID",
         "multi": true,
-        "name": "service",
+        "name": "clusterID",
         "options": [],
         "query": {
-          "query": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\"},service)",
+          "query": "label_values({__name__=~\"^kong.*\"},clusterID)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "stage"
+          ],
+          "value": [
+            "stage"
+          ]
+        },
+        "datasource": null,
+        "definition": "label_values({__name__=~\"^kong.*\",clusterID=~\"$clusterID\"},namespace)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "namespace",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "query": "label_values({__name__=~\"^kong.*\",clusterID=~\"$clusterID\"},namespace)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "stargate"
+          ],
+          "value": [
+            "stargate"
+          ]
+        },
+        "datasource": null,
+        "definition": "label_values({__name__=~\"^kong.*\",pod=~\"stargate-.*\",clusterID=~\"$clusterID\"},pod)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "deployment",
+        "multi": true,
+        "name": "deployment",
+        "options": [],
+        "query": {
+          "query": "label_values({__name__=~\"^kong.*\",pod=~\"stargate-.*\",clusterID=~\"$clusterID\"},pod)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/^(stargate.*)-[0-9a-f]*-.*$/",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": "$deployment.*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": null,
+        "definition": "label_values({__name__=~\"^kong.*\",pod=~\"$deployment-[0-9a-f]*-.*\",clusterID=~\"$clusterID\"},pod)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "pod",
+        "multi": true,
+        "name": "pod",
+        "options": [],
+        "query": {
+          "query": "label_values({__name__=~\"^kong.*\",pod=~\"$deployment-[0-9a-f]*-.*\",clusterID=~\"$clusterID\"},pod)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -2416,39 +2508,19 @@
       },
       {
         "allValue": ".*",
-        "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+        "current": {
+          "selected": true,
+          "text": [
+            "eni-ppp003-v1"
+          ],
+          "value": [
+            "eni-ppp003-v1"
+          ]
         },
-        "definition": "label_values(kong_nginx_connections_total,instance)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "",
-        "multi": true,
-        "name": "instance",
-        "options": [],
-        "query": {
-          "query": "label_values(kong_nginx_connections_total,instance)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 2,
-        "regex": ".*",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": ".*",
-        "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "definition": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\"},route)",
+        "datasource": null,
+        "definition": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"},route)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "",
@@ -2456,7 +2528,7 @@
         "name": "route",
         "options": [],
         "query": {
-          "query": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\"},route)",
+          "query": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\",clusterID=~\"$clusterID\",namespace=~\"$namespace\",pod=~\"$pod\"},route)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -2469,20 +2541,63 @@
         "useTags": false
       },
       {
-        "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+        "allValue": ".*",
+        "current": {
+          "selected": false,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
         },
-        "definition": "label_values(kong_upstream_target_health, upstream)",
+        "datasource": null,
+        "definition": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\"},exported_service)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
+        "label": "",
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": {
+          "query": "label_values({__name__=~\"kong_http_requests_total|kong_kong_latency_ms_bucket\"},exported_service)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": null,
+        "definition": "label_values(kong_upstream_target_health{pod=~\"$pod\"}, upstream)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
         "multi": true,
         "name": "upstream",
         "options": [],
         "query": {
-          "query": "label_values(kong_upstream_target_health, upstream)",
-          "refId": "Prometheus-upstream-Variable-Query"
+          "query": "label_values(kong_upstream_target_health{pod=~\"$pod\"}, upstream)",
+          "refId": "StandardVariableQuery"
         },
         "refresh": 1,
         "regex": "",
@@ -2525,8 +2640,7 @@
     ]
   },
   "timezone": "",
-  "title": "Kong (official)",
-  "uid": "mY9p7dQmz",
-  "version": 9,
-  "weekStart": ""
+  "title": "Kong (official) 3.1.1 (ENI Version)",
+  "uid": "kong3eni",
+  "version": 14
 }
