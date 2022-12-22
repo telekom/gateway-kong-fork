@@ -2,12 +2,13 @@ local version = setmetatable({
   major = 2,
   minor = 8,
   patch = 3,
+  eni = 1,
   --suffix = "rc.1"
 }, {
   -- our Makefile during certain releases adjusts this line. Any changes to
   -- the format need to be reflected in both places
   __tostring = function(t)
-    return string.format("%d.%d.%d%s", t.major, t.minor, t.patch,
+    return string.format("%d.%d.%d.&d%s", t.major, t.minor, t.patch, t.eni,
                          t.suffix or "")
   end
 })
