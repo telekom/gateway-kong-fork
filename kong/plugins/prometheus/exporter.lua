@@ -327,25 +327,32 @@ local function log(message, serialized)
       labels_tableEni[5] = message.response.status
       metrics.eni_status:inc(1, labels_tableEni)
 
-      if request_size and request_size > 0 then
+      local ingress_size = serialized.ingress_size
+      if ingress_size and ingress_size > 0 then
         labels_tableEni[5] = "ingress"
-        metrics.eni_bandwidth:inc(request_size, labels_tableEni)
+        metrics.eni_bandwidth:inc(ingress_size, labels_tableEni)
       end
 
-      if response_size and response_size > 0 then
+      local egress_size = serialized.egress_size
+      if egress_size and egress_size > 0 then
         labels_tableEni[5] = "egress"
-        metrics.eni_bandwidth:inc(response_size, labels_tableEni)
+        metrics.eni_bandwidth:inc(egress_size, labels_tableEni)
       end
 
-      if request_latency and request_latency >= 0 then
-        labels_tableEni[5] = "request"
-        metrics.eni_latency:observe(request_latency, labels_tableEni)
+      if serialized.latencies then
+        local request_latency = serialized.latencies.request
+        if request_latency and request_latency >= 0 then
+          labels_tableEni[5] = "request"
+          metrics.eni_latency:observe(request_latency, labels_tableEni)
+        end
+
+        local upstream_latency = serialized.latencies.proxy
+        if upstream_latency ~= nil and upstream_latency >= 0 then
+          labels_tableEni[5] = "upstream"
+          metrics.eni_latency:observe(upstream_latency, labels_tableEni)
+        end
       end
 
-      if upstream_latency ~= nil and upstream_latency >= 0 then
-        labels_tableEni[5] = "upstream"
-        metrics.eni_latency:observe(upstream_latency, labels_tableEni)
-      end
     end
     --eni part end
 
