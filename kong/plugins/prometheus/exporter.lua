@@ -19,6 +19,7 @@ local role = kong.configuration.role
 
 local KONG_LATENCY_BUCKETS = { 1, 2, 5, 7, 10, 15, 20, 30, 50, 75, 100, 200, 500, 750, 1000}
 local UPSTREAM_LATENCY_BUCKETS = {25, 50, 80, 100, 250, 400, 700, 1000, 2000, 5000, 10000, 30000, 60000 }
+local ENI_LATENCY_BUCKETS = { 1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
 
 local metrics = {}
 -- prometheus.lua instance
@@ -152,7 +153,7 @@ memory_stats.shm_capacity = prometheus:gauge("memory_lua_shared_dict_total_bytes
       "request time and upstream latency " ..
       "for each route/method/consumer in Kong",
     {"route", "method", "consumer", "customer_facing", "type"},
-    KONG_LATENCY_BUCKETS)
+    ENI_LATENCY_BUCKETS)
 
   metrics.eni_bandwidth = prometheus:counter("eni_bandwidth",
     "Bandwidth in bytes " ..
