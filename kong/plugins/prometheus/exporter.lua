@@ -43,9 +43,9 @@ local function init()
   prometheus = require("kong.plugins.prometheus.prometheus").init(shm, "kong_")
 
   -- global metrics
-  metrics.connections = prometheus:gauge("nginx_connections_total",
-    "Number of connections by subsystem",
-    {"node_id", "subsystem", "state"},
+  metrics.connections = prometheus:gauge("nginx_http_current_connections",
+    "Number of HTTP connections",
+    {"state"},
     prometheus.LOCAL_STORAGE)
   metrics.nginx_requests_total = prometheus:gauge("nginx_requests_total",
       "Number of requests total", {"node_id", "subsystem"},
