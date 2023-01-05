@@ -19,6 +19,7 @@ local role = kong.configuration.role
 
 local KONG_LATENCY_BUCKETS = { 1, 2, 5, 7, 10, 15, 20, 30, 50, 75, 100, 200, 500, 750, 1000}
 local UPSTREAM_LATENCY_BUCKETS = {25, 50, 80, 100, 250, 400, 700, 1000, 2000, 5000, 10000, 30000, 60000 }
+local ENI_LATENCY_BUCKETS = { 1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
 
 local metrics = {}
 -- prometheus.lua instance
@@ -42,9 +43,9 @@ local function init()
   prometheus = require("kong.plugins.prometheus.prometheus").init(shm, "kong_")
 
   -- global metrics
-  metrics.connections = prometheus:gauge("nginx_connections_total",
-    "Number of connections by subsystem",
-    {"node_id", "subsystem", "state"},
+  metrics.connections = prometheus:gauge("nginx_http_current_connections",
+    "Number of HTTP connections",
+    {"state"},
     prometheus.LOCAL_STORAGE)
   metrics.nginx_requests_total = prometheus:gauge("nginx_requests_total",
       "Number of requests total", {"node_id", "subsystem"},
@@ -152,7 +153,7 @@ memory_stats.shm_capacity = prometheus:gauge("memory_lua_shared_dict_total_bytes
       "request time and upstream latency " ..
       "for each route/method/consumer in Kong",
     {"route", "method", "consumer", "customer_facing", "type"},
-    KONG_LATENCY_BUCKETS)
+    ENI_LATENCY_BUCKETS)
 
   metrics.eni_bandwidth = prometheus:counter("eni_bandwidth",
     "Bandwidth in bytes " ..
@@ -327,25 +328,32 @@ local function log(message, serialized)
       labels_tableEni[5] = message.response.status
       metrics.eni_status:inc(1, labels_tableEni)
 
-      if request_size and request_size > 0 then
+      local ingress_size = serialized.ingress_size
+      if ingress_size and ingress_size > 0 then
         labels_tableEni[5] = "ingress"
-        metrics.eni_bandwidth:inc(request_size, labels_tableEni)
+        metrics.eni_bandwidth:inc(ingress_size, labels_tableEni)
       end
 
-      if response_size and response_size > 0 then
+      local egress_size = serialized.egress_size
+      if egress_size and egress_size > 0 then
         labels_tableEni[5] = "egress"
-        metrics.eni_bandwidth:inc(response_size, labels_tableEni)
+        metrics.eni_bandwidth:inc(egress_size, labels_tableEni)
       end
 
-      if request_latency and request_latency >= 0 then
-        labels_tableEni[5] = "request"
-        metrics.eni_latency:observe(request_latency, labels_tableEni)
+      if serialized.latencies then
+        local request_latency = serialized.latencies.request
+        if request_latency and request_latency >= 0 then
+          labels_tableEni[5] = "request"
+          metrics.eni_latency:observe(request_latency, labels_tableEni)
+        end
+
+        local upstream_latency = serialized.latencies.proxy
+        if upstream_latency ~= nil and upstream_latency >= 0 then
+          labels_tableEni[5] = "upstream"
+          metrics.eni_latency:observe(upstream_latency, labels_tableEni)
+        end
       end
 
-      if upstream_latency ~= nil and upstream_latency >= 0 then
-        labels_tableEni[5] = "upstream"
-        metrics.eni_latency:observe(upstream_latency, labels_tableEni)
-      end
     end
     --eni part end
 
