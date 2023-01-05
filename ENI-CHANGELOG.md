@@ -3,6 +3,11 @@
 This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
+## 2.8.3.2
+ - Prometheus plugin: renamed Nginx connections for 2.8. compatibility
+ - Prometheus plugin: dedicated old bucket size for ENI metrics
+ - Prometheus plugin: ENI metrics source variables fixed
+
 ## 2.8.3.1
  - Updated Prometheus plugin to version from Kong 3.1.1
  - ENI version indicator added to Kong version creation
