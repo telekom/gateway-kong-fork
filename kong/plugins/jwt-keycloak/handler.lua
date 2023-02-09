@@ -212,7 +212,7 @@ local function validate_signature(conf, jwt, second_call)
         if err then
             kong.log.err(err)
         end
-        security_event(221, 'public_key_not_available')
+        security_event('ua221', 'ua, public key not available')
         return kong.response.exit(403, { message = "Unable to get public key for issuer" })
     end
 
@@ -232,7 +232,7 @@ local function validate_signature(conf, jwt, second_call)
         return validate_signature(conf, jwt, true)
     end
 
-    security_event(222, 'invalid_token_signature')
+    security_event('ua222', 'ua, invalid token signature')
     return kong.response.exit(401, { message = "Invalid token signature" })
 end
 
@@ -275,13 +275,13 @@ local function do_authentication(conf)
     local token_type = type(token)
     if token_type ~= "string" then
         if token_type == "nil" then
-            security_event(200, 'token_not_provided')
+            security_event('ua200', 'ua, token not provided')
             return false, { status = 401, message = "Unauthorized" }
         elseif token_type == "table" then
-            security_event(200, 'multiple_tokens_provided')
+            security_event('ua200', 'ua, multiple tokens provided')
             return false, { status = 401, message = "Multiple tokens provided" }
         else
-            security_event(200, 'unrecognizable_token')
+            security_event('ua200', 'ua, unrecognizable token')
             return false, { status = 401, message = "Unrecognizable token" }
         end
     end
@@ -289,13 +289,13 @@ local function do_authentication(conf)
     -- Decode token
     local jwt, err = jwt_decoder:new(token)
     if err then
-        security_event(201, 'token_integrity_wrong')
+        security_event('ua201', 'ua, token integrity wrong')
         return false, { status = 401, message = "Bad token; " .. tostring(err) }
     end
 
     -- Verify algorithim
     if jwt.header.alg ~= (conf.algorithm or "HS256") then
-        security_event(201, 'token_integrity_wrong')
+        security_event('ua201', 'ua, token integrity wrong')
         return false, {status = 403, message = "Invalid algorithm"}
     end
 
@@ -303,7 +303,7 @@ local function do_authentication(conf)
     -- Verify the JWT registered claims
     local ok_claims, errors = jwt:verify_registered_claims(conf.claims_to_verify)
     if not ok_claims then
-        security_event(202, 'token_timed_out')
+        security_event('ua202', 'ua, token timed out')
         return false, { status = 401, message = "Token claims invalid: " .. table_to_string(errors) }
     end
 
@@ -311,22 +311,20 @@ local function do_authentication(conf)
     if conf.maximum_expiration ~= nil and conf.maximum_expiration > 0 then
         local ok, errors = jwt:check_maximum_expiration(conf.maximum_expiration)
         if not ok then
-            security_event(202, 'token_timed_out')
+            security_event('ua202', 'ua, token timed out')
             return false, { status = 403, message = "Token claims invalid: " .. table_to_string(errors) }
         end
     end
 
     -- Verify that the issuer is allowed
     if not validate_issuer(conf.allowed_iss, jwt.claims) then
-        -- TODO: dedicated security coden will be defined
-        security_event(222, 'incorrect_issuer')
+        security_event('ua222', 'ua, incorrect issuer')
         return false, { status = 401, message = "Token issuer not allowed" }
     end
 
     err = validate_signature(conf, jwt)
     if err ~= nil then
-        -- TODO: dedicated security coden will be defined
-        security_event(220, 'incorrect_token_signature')
+        security_event('ua220', 'ua, incorrect token signature')
         return false, err
     end
 
@@ -334,7 +332,7 @@ local function do_authentication(conf)
     if conf.consumer_match then
         local ok, err = match_consumer(conf, jwt)
         if not ok then
-            security_event(207, 'consumer_match_failed') -- this case practically does not occur in the current rover configuration (because consumer_match not useed))
+            security_event('ua207', 'ua, consumer_match failed') -- this case practically does not occur in the current rover configuration (because consumer_match not useed))
             return ok, err
         end
     end
@@ -346,26 +344,26 @@ local function do_authentication(conf)
     if ok then
         ok, err = validate_realm_roles(conf.realm_roles, jwt.claims)
     else
-        security_event(222, 'validate_scope_failed')
+        security_event('ua222', 'ua, validate_scope failed')
     end
 
     if ok then
         ok, err = validate_roles(conf.roles, jwt.claims)
     else
-        security_event(222, 'validate_realm_roles_failed')
+        security_event('ua222', 'ua, validate_realm_roles failed')
     end
 
     if ok then
         ok, err = validate_client_roles(conf.client_roles, jwt.claims)
     else
-        security_event(222, 'validate_roles_failed')
+        security_event('ua222', 'ua, validate_roles failed')
     end
 
     if ok then
         kong.ctx.shared.jwt_keycloak_token = jwt
         return true
     else
-        security_event(222, 'validate_client_roles_failed')
+        security_event('ua222', 'ua, validate_client_roles failed')
     end
 
     return false, { status = 403, message = "Access token does not have the required scope/role: " .. err }
