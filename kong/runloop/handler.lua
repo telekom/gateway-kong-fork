@@ -1295,6 +1295,9 @@ return {
       local router = get_updated_router()
       local match_t = router.exec(ctx)
       if not match_t then
+        -- eni: log security event
+        ngx.var.sec_event_code="ua209"
+        ngx.var.sec_event_details="ua, not existing resource, wrong uri, wrong uuid"
         return kong.response.exit(404, { message = "no Route matched with those values" })
       end
 
