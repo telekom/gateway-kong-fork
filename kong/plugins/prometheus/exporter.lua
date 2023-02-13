@@ -253,6 +253,14 @@ local function log(message, serialized)
   if http_subsystem then
     if message and serialized.consumer ~= nil then
       consumer = serialized.consumer
+      --eni part start
+      if consumer == "gateway" then
+        local pubsub_consumer = ngx.var.http_x_pubsub_subscriber_id
+        if pubsub_consumer then
+            consumer = "gateway:" .. pubsub_consumer
+        end
+      end
+      --eni part stop
     end
   else
     consumer = nil -- no consumer in stream
@@ -320,10 +328,10 @@ local function log(message, serialized)
     end
 
         --eni part start
-    if serialized.consumer then
-      labels_tableEni[1] = labels_table_status[2]
+    if consumer then
+      labels_tableEni[1] = labels_table_status[2] -- route_name
       labels_tableEni[2] = serialized.method
-      labels_tableEni[3] = serialized.consumer
+      labels_tableEni[3] = consumer
       labels_tableEni[4] = serialized.customer_facing
       labels_tableEni[5] = message.response.status
       metrics.eni_status:inc(1, labels_tableEni)
