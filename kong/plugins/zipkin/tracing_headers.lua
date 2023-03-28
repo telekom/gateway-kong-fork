@@ -414,8 +414,15 @@ local function parse(headers, conf_header_type)
     baggage = ot_baggage or jaeger_baggage or nil
   end
 
-
   return header_type, trace_id, span_id, parent_id, should_sample, tardis_id, baggage
+end
+
+local function parse_business_headers(headers)
+  local request_id, business_context, correlation_id
+  request_id = headers["x-request-id"]
+  business_context = headers["x-business-context"]
+  correlation_id = headers["x-correlation-id"]
+  return request_id, business_context, correlation_id
 end
 
 
@@ -498,4 +505,5 @@ return {
   parse = parse,
   set = set,
   from_hex = from_hex,
+  parse_business_headers = parse_business_headers,
 }

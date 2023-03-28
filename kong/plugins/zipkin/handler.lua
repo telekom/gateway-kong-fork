@@ -49,30 +49,36 @@ local function get_reporter(conf)
 end
 
 
-local function tag_with_service_and_route(span)
+local function tag_with_service(span, conf_environment)
   local service = kong.router.get_service()
-  if service and service.id then
-    span:set_tag("kong.service", service.id)
+  if service then
 
-    local tags = service.tags
     local environment = ""
 
-    if tags then
-      for k, v in pairs(tags) do
-        if string.find(v, "environment") then
-          environment = string.gsub(v, "ei__telekom__de%-%-environment%-%-%-", "")
+    if conf_environment then
+      environment = conf_environment
+    else
+      local tags = service.tags
+      if tags then
+        for k, v in pairs(tags) do
+          if string.find(v, "environment") then
+            environment = string.gsub(v, "ei__telekom__de%-%-environment%-%-%-", "")
+          end
         end
       end
-      if environment then
-        span:set_tag("environment", environment)
-      end
     end
-    
+
+    if environment then
+      span:set_tag("environment", environment)
+    end
+
     if type(service.name) == "string" then
       span.service_name = service.name
-      span:set_tag("kong.service_name", service.name)
+      span:set_tag("kong.service", service.name)
     end
   end
+
+--[[ on tardis service_name == route_name, so no need to provide both
 
   local route = kong.router.get_route()
   if route then
@@ -83,6 +89,7 @@ local function tag_with_service_and_route(span)
       span:set_tag("kong.route_name", route.name)
     end
   end
+--]]
 end
 
 local function copy_tardis_tags_to_child(parent, child)
@@ -105,7 +112,7 @@ local function get_or_add_proxy_span(zipkin, timestamp)
       request_span.name .. " (proxy)",
       timestamp
     )
-    copy_tardis_tags_to_child(request_span, zipkin.proxy_span)
+    --copy_tardis_tags_to_child(request_span, zipkin.proxy_span)
   end
   return zipkin.proxy_span
 end
@@ -186,6 +193,18 @@ if subsystem == "http" then
     if tardis_id == nil then
       tardis_id = get_tardis_id()
       request_span:set_tag("x-tardis-consumer-side", "true")
+    end
+
+    local request_id, business_context, correlation_id = tracing_headers.parse_business_headers(req_headers)
+
+    if request_id then
+      request_span:set_tag("x-request-id", request_id)
+    end
+    if business_context then
+      request_span:set_tag("x-business-context", business_context)
+    end
+    if correlation_id then
+      request_span:set_tag("x-correlation-id", correlation_id)
     end
 
     request_span.ip = kong.client.get_forwarded_ip()
@@ -380,6 +399,22 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
     local balancer_tries = balancer_data.tries
     for i = 1, balancer_data.try_count do
       local try = balancer_tries[i]
+
+      proxy_span:annotate(fmt("bts.%d", i), try.balancer_start * 1000)
+
+      if i < balancer_data.try_count then
+              proxy_span:set_tag("error", true)
+              proxy_span:set_tag(fmt("kong.balancer.state.%d", i), try.state)
+              proxy_span:set_tag(fmt("http.status_code.%d", i), try.code)
+      end
+
+      if try.balancer_latency ~= nil then
+        proxy_span:annotate(fmt("btf.%d", i), (try.balancer_start + try.balancer_latency) * 1000)
+      else
+        proxy_span:annotate(fmt("btf.%d", i), now_mu)
+      end
+
+      --[[
       local name = fmt("%s (balancer try %d)", request_span.name, i)
       local span = request_span:new_child("CLIENT", name, try.balancer_start * 1000)
       span.ip = try.ip
@@ -401,6 +436,7 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
         span:finish(now_mu)
       end
       reporter:report(span)
+    --]]
     end
     proxy_span:set_tag("peer.hostname", balancer_data.hostname) -- could be nil
     proxy_span.ip   = balancer_data.ip
@@ -410,15 +446,19 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
   if subsystem == "http" then
     request_span:set_tag("http.status_code", kong.response.get_status())
   end
-  if ngx_ctx.authenticated_consumer then
-    request_span:set_tag("kong.consumer", ngx_ctx.authenticated_consumer.id)
+
+  if ngx_ctx.authenticated_consumer and ngx_ctx.authenticated_consumer.custom_id then
+    request_span:set_tag("kong.consumer", ngx_ctx.authenticated_consumer.custom_id)
   end
+
   if conf.include_credential and ngx_ctx.authenticated_credential then
     request_span:set_tag("kong.credential", ngx_ctx.authenticated_credential.id)
   end
-  request_span:set_tag("kong.node.id", kong.node.get_id())
+  --request_span:set_tag("kong.node.id", kong.node.get_id())
 
-  tag_with_service_and_route(proxy_span)
+  --tag_with_service_and_route(proxy_span)
+  tag_with_service(request_span, conf.environment)
+
 
   proxy_span:finish(proxy_finish_mu)
   reporter:report(proxy_span)
