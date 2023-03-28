@@ -37,7 +37,6 @@ local function ngx_req_start_time_mu()
   return ngx_req_start_time() * 1000000
 end
 
-
 local function get_reporter(conf)
   if reporter_cache[conf] == nil then
     reporter_cache[conf] = new_zipkin_reporter(conf.http_endpoint,
@@ -191,8 +190,9 @@ if subsystem == "http" then
     local protocol = http_version and 'HTTP/'..http_version or nil
 
     if tardis_id == nil then
-      tardis_id = get_tardis_id()
+      tardis_id = to_hex(get_tardis_id())
       request_span:set_tag("x-tardis-consumer-side", "true")
+      tracing_headers.set_tardis_id(tardis_id)
     end
 
     local request_id, business_context, correlation_id = tracing_headers.parse_business_headers(req_headers)
@@ -207,18 +207,31 @@ if subsystem == "http" then
       request_span:set_tag("x-correlation-id", correlation_id)
     end
 
+    local publisher, subscriber = tracing_headers.parse_horizon_headers(req_headers)
+
+    if publisher then
+      request_span:set_tag("publisher", publisher)
+
+      if subscriber then
+        request_span:set_tag("subscriber", subscriber)
+      end
+    end
+
     request_span.ip = kong.client.get_forwarded_ip()
     request_span.port = kong.client.get_forwarded_port()
 
     local lc = conf.local_component_name or "kong"
 
-    request_span:set_tag("x-tardis-traceid", to_hex(tardis_id))
+    request_span:set_tag("x-tardis-traceid", tardis_id)
     request_span:set_tag("lc", lc)
     request_span:set_tag("http.method", method)
     request_span:set_tag("http.host", req.get_host())
     request_span:set_tag("http.path", req.get_path())
     if protocol then
       request_span:set_tag("http.protocol", protocol)
+    end
+    if conf.zone then
+      request_span:set_tag("zone", conf.zone)
     end
 
     local static_tags = conf.static_tags

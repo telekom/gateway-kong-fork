@@ -61,6 +61,7 @@ return {
                                     one_of = { "b3", "b3-single", "w3c", "jaeger", "ot" } } },
           { tags_header = { type = "string", required = true, default = "Zipkin-Tags" } },
           { environment = { type = "string", default = nil } },
+          { zone = { type = "string", default = nil } },
           { static_tags = { type = "array", elements = static_tag,
                             custom_validator = validate_static_tags } },
         },

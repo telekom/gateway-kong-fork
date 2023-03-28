@@ -425,6 +425,17 @@ local function parse_business_headers(headers)
   return request_id, business_context, correlation_id
 end
 
+local function parse_horizon_headers(headers)
+  local publisher, subscriber
+  publisher = headers["x-pubsub-publisher-id"]
+  subscriber = headers["x-pubsub-subscriber-id"]
+  return publisher, subscriber
+end
+
+local function set_tardis_id(tardis_id)
+  local set_header = kong.service.request.set_header
+  set_header("x-tardis-traceid", tardis_id)
+end
 
 local function set(conf_header_type, found_header_type, proxy_span, conf_default_header_type)
   local set_header = kong.service.request.set_header
@@ -437,11 +448,6 @@ local function set(conf_header_type, found_header_type, proxy_span, conf_default
      conf_header_type ~= found_header_type
   then
     kong.log.warn("Mismatched header types. conf: " .. conf_header_type .. ". found: " .. found_header_type)
-  end
-
-  local tardis_id = proxy_span:get_tag("x-tardis-traceid")
-  if tardis_id then
-    set_header("x-tardis-traceid", tardis_id)
   end
 
   found_header_type = found_header_type or conf_default_header_type or "b3"
@@ -504,6 +510,8 @@ end
 return {
   parse = parse,
   set = set,
+  set_tardis_id = set_tardis_id,
   from_hex = from_hex,
   parse_business_headers = parse_business_headers,
+  parse_horizon_headers = parse_horizon_headers,
 }
