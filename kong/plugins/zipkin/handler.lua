@@ -201,13 +201,13 @@ if subsystem == "http" then
 
     local request_id, business_context, correlation_id = tracing_headers.parse_business_headers(req_headers)
 
-    if request_id then
+    if request_id and type(request_id) == "string" then
       request_span:set_tag("x-request-id", request_id)
     end
-    if business_context then
+    if business_context and type(business_context) == "string" then
       request_span:set_tag("x-business-context", business_context)
     end
-    if correlation_id then
+    if correlation_id and type(correlation_id) == "string" then
       request_span:set_tag("x-correlation-id", correlation_id)
     end
 
