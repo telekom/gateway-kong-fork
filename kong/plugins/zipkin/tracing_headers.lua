@@ -261,7 +261,7 @@ local function parse_tardis_headers(headers)
     return nil
   end
 
-  return from_hex(tardis_id)
+  return tardis_id
 end
 
 local function parse_jaeger_trace_context_headers(jaeger_header)
