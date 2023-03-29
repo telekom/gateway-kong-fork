@@ -62,6 +62,7 @@ return {
           { tags_header = { type = "string", required = true, default = "Zipkin-Tags" } },
           { environment = { type = "string", default = nil } },
           { zone = { type = "string", default = nil } },
+          { force_sample = { type = "boolean", default = false } },
           { static_tags = { type = "array", elements = static_tag,
                             custom_validator = validate_static_tags } },
         },

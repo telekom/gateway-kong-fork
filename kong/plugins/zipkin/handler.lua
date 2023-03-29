@@ -164,6 +164,10 @@ if subsystem == "http" then
 
     local method = req.get_method()
 
+    if conf.force_sample then
+      should_sample = conf.force_sample
+    end
+
     if starts_with(req_path, "/admin-api") then
       should_sample = false
     end
