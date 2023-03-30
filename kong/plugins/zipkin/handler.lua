@@ -91,17 +91,6 @@ local function tag_with_service(span, conf_environment)
 --]]
 end
 
-local function copy_tardis_tags_to_child(parent, child)
-  local tardis_id = parent:get_tag("x-tardis-traceid")
-  if tardis_id then
-    child:set_tag("x-tardis-traceid", tardis_id)
-  end
-  local tardis_consumer_side = parent:get_tag("x-tardis-consumer-side")
-  if tardis_consumer_side then
-    child:set_tag("x-tardis-consumer-side", tardis_consumer_side)
-  end
-end
-
 -- adds the proxy span to the zipkin context, unless it already exists
 local function get_or_add_proxy_span(zipkin, timestamp)
   if not zipkin.proxy_span then
@@ -112,7 +101,6 @@ local function get_or_add_proxy_span(zipkin, timestamp)
       timestamp
     )
     zipkin.proxy_span:set_tag("x-tardis-traceid", request_span:get_tag("x-tardis-traceid"))
-    --copy_tardis_tags_to_child(request_span, zipkin.proxy_span)
   end
   return zipkin.proxy_span
 end
@@ -432,7 +420,7 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
         proxy_span:annotate(fmt("btf.%d", i), now_mu)
       end
 
-      --[[
+      --[[ merge all available information to proxy span instead of creating additional span(s)
       local name = fmt("%s (balancer try %d)", request_span.name, i)
       local span = request_span:new_child("CLIENT", name, try.balancer_start * 1000)
       span.ip = try.ip
