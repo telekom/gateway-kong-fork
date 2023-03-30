@@ -111,6 +111,7 @@ local function get_or_add_proxy_span(zipkin, timestamp)
       request_span.name .. " (proxy)",
       timestamp
     )
+    zipkin.proxy_span:set_tag("x-tardis-traceid", request_span:get_tag("x-tardis-traceid"))
     --copy_tardis_tags_to_child(request_span, zipkin.proxy_span)
   end
   return zipkin.proxy_span
@@ -461,7 +462,11 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
   end
 
   if subsystem == "http" then
-    request_span:set_tag("http.status_code", kong.response.get_status())
+    local status_code = kong.response.get_status()
+    request_span:set_tag("http.status_code", status_code)
+    if status_code >= 400 then
+      request_span:set_tag("error", true)
+    end
   end
 
   if ngx_ctx.authenticated_consumer and ngx_ctx.authenticated_consumer.custom_id then
