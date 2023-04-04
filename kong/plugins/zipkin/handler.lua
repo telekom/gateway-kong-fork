@@ -465,7 +465,7 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
     request_span:set_tag("kong.credential", ngx_ctx.authenticated_credential.id)
   end
   --request_span:set_tag("kong.node.id", kong.node.get_id())
-
+  request_span:set_tag("kong.pod", kong.node.get_hostname())
   --tag_with_service_and_route(proxy_span)
   tag_with_service(request_span, conf.environment)
 
