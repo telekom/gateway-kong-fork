@@ -54,7 +54,7 @@ local function tag_with_service(span, conf_environment)
 
     local environment = ""
 
-    if conf_environment then
+    if conf_environment and conf_environment ~= "qa" then
       environment = conf_environment
     else
       local tags = service.tags
