@@ -47,8 +47,14 @@ local function get_reporter(conf)
   return reporter_cache[conf]
 end
 
+local function tag_with_service(span)
+  local service = kong.router.get_service()
+  if service and type(service.name) == "string" then
+     span.service_name = service.name
+  end
+end
 
-local function tag_with_service(span, conf_environment)
+local function tag_with_environment(span, conf_environment)
   local service = kong.router.get_service()
   if service then
 
@@ -72,23 +78,11 @@ local function tag_with_service(span, conf_environment)
     end
 
     if type(service.name) == "string" then
-      span.service_name = service.name
+      --span.service_name = service.name
       span:set_tag("kong.service", service.name)
     end
   end
 
---[[ on tardis service_name == route_name, so no need to provide both
-
-  local route = kong.router.get_route()
-  if route then
-    if route.id then
-      span:set_tag("kong.route", route.id)
-    end
-    if type(route.name) == "string" then
-      span:set_tag("kong.route_name", route.name)
-    end
-  end
---]]
 end
 
 -- adds the proxy span to the zipkin context, unless it already exists
@@ -466,8 +460,8 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
   end
   --request_span:set_tag("kong.node.id", kong.node.get_id())
   request_span:set_tag("kong.pod", kong.node.get_hostname())
-  --tag_with_service_and_route(proxy_span)
-  tag_with_service(request_span, conf.environment)
+  tag_with_service(proxy_span)
+  tag_with_environment(request_span, conf.environment)
 
 
   proxy_span:finish(proxy_finish_mu)
