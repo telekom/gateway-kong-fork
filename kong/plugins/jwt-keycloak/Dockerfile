@@ -17,7 +17,7 @@ RUN luarocks make && luarocks pack kong-plugin-jwt-keycloak ${PLUGIN_VERSION}
 ## Create Image
 FROM kong:${KONG_VERSION}
 
-ENV KONG_PLUGINS="bundled,jwt-keycloak"
+ENV KONG_PLUGINS="bundled,jwt-keycloak,cequence-ai-unified"
 
 COPY --from=builder /tmp/*.rock /tmp/
 
