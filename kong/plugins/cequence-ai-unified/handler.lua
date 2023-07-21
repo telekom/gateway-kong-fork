@@ -636,8 +636,10 @@ local function get_m2m_access_token(conf)
                                   conf.auth_domain, conf.realm)
 
   kong.log("Cequence: Token URL is - " .. token_url)
+  kong.log("Cequence: Body params for token request - " .. tokenReq)
 
   while retryCount < maxRetryCount do
+    kong.log(string.format("Initiated token request %d time", retryCount))
     local res, err = httpc:request_uri(token_url, tokenParams)
 
     if res and res.status == 200 then
@@ -654,6 +656,10 @@ local function get_m2m_access_token(conf)
       ttl = (exp_time - os.time())
       kong.log(string.format("Cequence: Value of ttl %d - ", ttl))
       return token
+    end
+    
+    if res then
+      kong.log("Cequence: Unified token request failed with response code - ", res.status)
     end
 
     kong.log(string.format("Cequence: Failed to retrieve token. Retry in %dms.", retryDelay))
