@@ -3,6 +3,16 @@
 This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
+
+## 2.8.3.6
+ - Bugfix: Wrong Kong version in admin API
+
+## 2.8.3.5
+ - decreased log level for msg "Mismatched header types. conf"
+
+## 2.8.3.4
+ - tracing adjusted
+
 ## 2.8.3.3
  - Prometheus plugin: use X-Pubsub-Subscriber-Id header as consumer in prometheus metrics
  - jwt-keycloak and acl plugins: Use ua-prefix to distinguish between http-code and security-events 
