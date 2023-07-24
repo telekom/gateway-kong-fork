@@ -660,7 +660,9 @@ local function get_m2m_access_token(conf)
     
     if res then
       kong.log("Cequence: Unified token request failed with response code - ", res.status)
-    end
+    else
+      kong.log("Cequence: Unified token request response not received - ", err)
+    end 
 
     kong.log(string.format("Cequence: Failed to retrieve token. Retry in %dms.", retryDelay))
     ngx.sleep(retryDelay / 1000)  -- Sleep for retryDelay milliseconds
