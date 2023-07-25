@@ -635,8 +635,8 @@ local function get_m2m_access_token(conf)
   local token_url = string.format("https://%s/auth/realms/%s/protocol/openid-connect/token",
                                   conf.auth_domain, conf.realm)
 
-  kong.log("Cequence: Token URL is - " .. token_url)
-  kong.log("Cequence: Body params for token request - " .. tokenReq)
+  -- kong.log("Cequence: Token URL is - " .. token_url)
+  -- kong.log("Cequence: Body params for token request - " .. tokenReq)
 
   while retryCount < maxRetryCount do
     kong.log(string.format("Initiated token request %d time", retryCount))
