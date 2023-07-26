@@ -4,6 +4,9 @@ This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
 
+## 2.8.3.7
+ - Added cequence-ai-unified plugin
+
 ## 2.8.3.6
  - Bugfix: Wrong Kong version in admin API
 
