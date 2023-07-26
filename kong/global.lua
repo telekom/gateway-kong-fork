@@ -13,11 +13,10 @@ local setmetatable = setmetatable
 
 
 local KONG_VERSION = tostring(meta._VERSION)
-local KONG_VERSION_NUM = tonumber(string.format("%d%.2d%.2d.2d",
+local KONG_VERSION_NUM = tonumber(string.format("%d%.2d%.2d",
                                   meta._VERSION_TABLE.major * 100,
                                   meta._VERSION_TABLE.minor * 10,
-                                  meta._VERSION_TABLE.patch,
-                                  meta._VERSION_TABLE.eni))
+                                  meta._VERSION_TABLE.patch))
 
 local LOCK_OPTS = {
   exptime = 10,
