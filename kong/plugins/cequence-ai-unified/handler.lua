@@ -932,8 +932,8 @@ function CequenceAIUnifiedHandler:log(conf)
   end
 
   -- Log the entry for processing
-  kong.log("Cequence: Unified entry transaction id pushed for processing is ",
-           kong.ctx.plugin.cequence_trn_id)
+  --kong.log("Cequence: Unified entry transaction id pushed for processing is ",
+  --         kong.ctx.plugin.cequence_trn_id)
   -- kong.log("Cequence: Unified entry pushed for processing is ", entry)
   -- Process the entry
 
