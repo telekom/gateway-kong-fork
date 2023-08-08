@@ -877,8 +877,8 @@ function CequenceAIUnifiedHandler:access()
       },
       headers = getbase64EncodedHeadersArray( kong.request.get_headers() ),
       body = {
-      ['length'] = string.len( kong.request.get_raw_body() ),
-      ['data'] = ngx.encode_base64( kong.request.get_raw_body() )
+      ['length'] = string.len( kong.request.get_raw_body() or '' ),
+      ['data'] = ngx.encode_base64( kong.request.get_raw_body() or '' )
       },
     },
     response = {
