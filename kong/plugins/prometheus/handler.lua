@@ -22,37 +22,35 @@ function PrometheusHandler.log(self, conf)
   local message = kong.log.serialize()
 
   local serialized = {}
-  if conf.eni_stat then
-    if conf.per_consumer and message.consumer ~= nil then
-      serialized.consumer = message.consumer.username
-    else
-      serialized.consumer = "anonymous"
-    end
 
-    if conf.status_code_metrics then
-      if http_subsystem and message.response then
-        serialized.status_code = message.response.status
-      elseif not http_subsystem and message.session then
-        serialized.status_code = message.session.status
-      end
-    end
-  
-    if conf.bandwidth_metrics then
-      if http_subsystem then
-        serialized.egress_size = message.response and tonumber(message.response.size)
-        serialized.ingress_size = message.request and tonumber(message.request.size)
-      else
-        serialized.egress_size = message.response and tonumber(message.session.sent)
-        serialized.ingress_size = message.request and tonumber(message.session.received)
-      end
-    end
+  if conf.per_consumer and message.consumer ~= nil then
+    serialized.consumer = message.consumer.username
+  else
+    serialized.consumer = "anonymous"
+  end
 
-    if message.request and message.request.method ~= nil then
-      serialized.method = message.request.method
-    else
-      serialized.method = "default"
+  if conf.status_code_metrics then
+    if http_subsystem and message.response then
+      serialized.status_code = message.response.status
+    elseif not http_subsystem and message.session then
+      serialized.status_code = message.session.status
     end
-    serialized.customer_facing = conf.customer_facing
+  end
+
+  if conf.bandwidth_metrics then
+    if http_subsystem then
+      serialized.egress_size = message.response and tonumber(message.response.size)
+      serialized.ingress_size = message.request and tonumber(message.request.size)
+    else
+      serialized.egress_size = message.response and tonumber(message.session.sent)
+      serialized.ingress_size = message.request and tonumber(message.session.received)
+    end
+  end
+
+  if message.request and message.request.method ~= nil then
+    serialized.method = message.request.method
+  else
+    serialized.method = "default"
   end
 
   if conf.latency_metrics then
@@ -61,6 +59,8 @@ function PrometheusHandler.log(self, conf)
 
   if conf.upstream_health_metrics then
     exporter.set_export_upstream_health_metrics(true)
+  else
+    exporter.set_export_upstream_health_metrics(false)
   end
 
   exporter.log(message, serialized)
