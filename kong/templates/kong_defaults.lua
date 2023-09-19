@@ -204,4 +204,5 @@ wasm_dynamic_module = NONE
 
 request_debug = on
 request_debug_token =
+extra_error_log_path =
 ]]
