@@ -185,7 +185,6 @@ if subsystem == "http" then
     if tardis_id == nil then
       tardis_id = to_hex(get_tardis_id())
       request_span:set_tag("x-tardis-consumer-side", "true")
-      tracing_headers.set_tardis_id(tardis_id)
     end
 
     local request_id, business_context, correlation_id = tracing_headers.parse_business_headers(req_headers)
@@ -280,6 +279,7 @@ if subsystem == "http" then
     get_or_add_proxy_span(zipkin, access_start)
 
     tracing_headers.set(conf.header_type, zipkin.header_type, zipkin.proxy_span, conf.default_header_type)
+    tracing_headers.set_tardis_id(zipkin.request_span:get_tag("x-tardis-traceid"))
   end
 
 
