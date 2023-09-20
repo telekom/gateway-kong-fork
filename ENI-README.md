@@ -13,7 +13,8 @@ Releases have a eni-release/x.x.x.x equivalent and released as x.x.x.x. The fina
 
 ## Hot to build release?
 Create a release branch e.g. eni-release/2.8.1.4 from the eni-release/2.8.1.x branch. \
-Prepare a final release with setting MTR_TARGET_TAG to the proper image version, e.g. 2.8.1.4. \
+If not set in gitlab-ci: Prepare a final release with setting MTR_TARGET_TAG to the proper image version, e.g. 2.8.1.4. \
+Increase the ENI version in kong/meta.lua. \
 Create a tag with the release name, e.g. 2.8.1.4. \
 Build the image by triggering the build job. \
 Delete the eni-release/2.8.1.4 branch.
