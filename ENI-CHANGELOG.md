@@ -3,6 +3,11 @@
 This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
+## 2.8.3.8
+- zipkin fix
+
+## 2.8.3.7
+- skipped due to cequence version
 
 ## 2.8.3.6
  - Bugfix: Wrong Kong version in admin API
@@ -15,7 +20,7 @@ This document show changes done by ENI teams to original Kong.
 
 ## 2.8.3.3
  - Prometheus plugin: use X-Pubsub-Subscriber-Id header as consumer in prometheus metrics
- - jwt-keycloak and acl plugins: Use ua-prefix to distinguish between http-code and security-events 
+ - jwt-keycloak and acl plugins: Use ua-prefix to distinguish between http-code and security-events
  - Kong: Security event ua209 added in case of "404, no Route matched..."
 
 ## 2.8.3.2
