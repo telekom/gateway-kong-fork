@@ -15,7 +15,7 @@ stages:
 - publish
 
 default:
-  tags: [ "otc_run_docker_m" ]
+  tags: [ "otc_run_sysbox_m" ]
 
 # jobs
 
@@ -33,7 +33,7 @@ semgrep:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - if: $CI_COMMIT_BRANCH == "develop"
-  
+
   variables:
     SEMGREP_RULES: >-
       p/security-audit
