@@ -21,7 +21,7 @@ local role = kong.configuration.role
 
 local KONG_LATENCY_BUCKETS = { 1, 2, 5, 7, 10, 15, 20, 30, 50, 75, 100, 200, 500, 750, 1000}
 local UPSTREAM_LATENCY_BUCKETS = {25, 50, 80, 100, 250, 400, 700, 1000, 2000, 5000, 10000, 30000, 60000 }
-local ENI_LATENCY_BUCKETS = { 1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
+local ENI_LATENCY_BUCKETS = { 10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
 
 local metrics = {}
 -- prometheus.lua instance
@@ -148,18 +148,17 @@ local function init()
   ]]--
 
   -- eni
-  metrics.status = prometheus:counter("http_status",
+  metrics.status = prometheus:counter("http_requests_total",
     "HTTP status codes per consumer/method/route in Kong",
     {"route", "method", "consumer", "source", "code"})
 
-  metrics.latency = prometheus:histogram("latency",
-    "Total latency incurred during requests (request) / " ..
-      "Latency added by upstream response (upstream) " ..
+  metrics.latency = prometheus:histogram("request_latency_ms",
+    "Total latency incurred during requests " ..
       "for each route in Kong",
-    {"route", "type"},
+    {"route", "method", "consumer"},
     ENI_LATENCY_BUCKETS)
 
-  metrics.bandwidth = prometheus:counter("bandwidth",
+  metrics.bandwidth = prometheus:counter("bandwidth_bytes",
     "Total bandwidth (ingress/egress) " ..
       "throughput in bytes",
     {"route", "direction", "consumer"})
@@ -212,7 +211,7 @@ end
 -- so putting the "more dynamic" label at the end will save us some memory
 local labels_table_bandwidth = {0, 0, 0}
 local labels_table_status = {0, 0, 0, 0, 0}
-local labels_table_latency = {0, 0}
+local labels_table_latency = {0, 0, 0}
 local upstream_target_addr_health_table = {
   { value = 0, labels = { 0, 0, 0, "healthchecks_off", ngx.config.subsystem } },
   { value = 0, labels = { 0, 0, 0, "healthy", ngx.config.subsystem } },
@@ -372,25 +371,13 @@ local function log(message, serialized)
 
   if serialized.latencies then
     labels_table_latency[1] = route_name
+    labels_table_latency[2] = serialized.method
+    labels_table_latency[3] = consumer
 
     if http_subsystem then
       local request_latency = serialized.latencies.request
       if request_latency and request_latency >= 0 then
-        labels_table_latency[2] = "request"
         metrics.latency:observe(request_latency, labels_table_latency)
-      end
-
-      local upstream_latency = serialized.latencies.proxy
-      if upstream_latency ~= nil and upstream_latency >= 0 then
-        labels_table_latency[2] = "upstream"
-        metrics.latency:observe(upstream_latency, labels_table_latency)
-      end
-
-    else
-      local session_latency = serialized.latencies.session
-      if session_latency and session_latency >= 0 then
-        labels_table_latency[2] = "request"
-        metrics.latency:observe(session_latency, labels_table_latency)
       end
     end
   end
