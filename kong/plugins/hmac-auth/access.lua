@@ -276,24 +276,29 @@ local function set_consumer(consumer, credential)
   end
 end
 
+local function unauthorized(message, realm)
+  return { status = 401, message = message, headers = { ["WWW-Authenticate"] = 'hmac' .. ' realm="' .. realm .. '"' } }
+end
+
 
 local function do_authentication(conf)
   local authorization = kong_request.get_header(AUTHORIZATION)
   local proxy_authorization = kong_request.get_header(PROXY_AUTHORIZATION)
+  local realm = conf.realm or ngx.var.host
 
   -- If both headers are missing, return 401
   if not (authorization or proxy_authorization) then
-    return false, { status = 401, message = "Unauthorized" }
+    return false, unauthorized("Unauthorized", realm)
   end
 
   -- validate clock skew
   if not (validate_clock_skew(X_DATE, conf.clock_skew) or
           validate_clock_skew(DATE, conf.clock_skew)) then
-    return false, {
-      status = 401,
-      message = "HMAC signature cannot be verified, a valid date or " ..
-                "x-date header is required for HMAC Authentication"
-    }
+    return false, unauthorized(
+      "HMAC signature cannot be verified, a valid date or " ..
+      "x-date header is required for HMAC Authentication",
+      realm
+    )
   end
 
   -- retrieve hmac parameter from Proxy-Authorization header
@@ -313,26 +318,26 @@ local function do_authentication(conf)
   local ok, err = validate_params(hmac_params, conf)
   if not ok then
     kong.log.debug(err)
-    return false, { status = 401, message = SIGNATURE_NOT_VALID }
+    return false, unauthorized(SIGNATURE_NOT_VALID, realm)
   end
 
   -- validate signature
   local credential = load_credential(hmac_params.username)
   if not credential then
     kong.log.debug("failed to retrieve credential for ", hmac_params.username)
-    return false, { status = 401, message = SIGNATURE_NOT_VALID }
+    return false, unauthorized(SIGNATURE_NOT_VALID, realm)
   end
 
   hmac_params.secret = credential.secret
 
   if not validate_signature(hmac_params) then
-    return false, { status = 401, message = SIGNATURE_NOT_SAME }
+    return false, unauthorized(SIGNATURE_NOT_SAME, realm)
   end
 
   -- If request body validation is enabled, then verify digest.
   if conf.validate_request_body and not validate_body() then
     kong.log.debug("digest validation failed")
-    return false, { status = 401, message = SIGNATURE_NOT_SAME }
+    return false, unauthorized(SIGNATURE_NOT_SAME, realm)
   end
 
   -- Retrieve consumer
