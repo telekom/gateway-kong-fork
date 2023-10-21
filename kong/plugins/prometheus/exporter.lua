@@ -19,9 +19,10 @@ local stream_available, stream_api = pcall(require, "kong.tools.stream_api")
 
 local role = kong.configuration.role
 
-local KONG_LATENCY_BUCKETS = { 1, 2, 5, 7, 10, 15, 20, 30, 50, 75, 100, 200, 500, 750, 1000}
-local UPSTREAM_LATENCY_BUCKETS = {25, 50, 80, 100, 250, 400, 700, 1000, 2000, 5000, 10000, 30000, 60000 }
-local ENI_LATENCY_BUCKETS = { 10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
+local ENI_LATENCY_BUCKETS = { 1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,30000,60000 }
+
+local HORIZON_CONSUMER = "eventstore"
+local LATENCY_OMIT_PATTERN = "-sse-"
 
 local metrics = {}
 -- prometheus.lua instance
@@ -97,57 +98,6 @@ local function init()
 
   metrics.memory_stats = memory_stats
 
-  --[[
-  -- per service/route
-  if http_subsystem then
-    metrics.status = prometheus:counter("http_requests_total",
-                                        "HTTP status codes per consumer/service/route in Kong",
-                                        {"service", "route", "code", "source", "consumer"})
-  else
-    metrics.status = prometheus:counter("stream_sessions_total",
-                                        "Stream status codes per service/route in Kong",
-                                        {"service", "route", "code", "source"})
-  end
-  metrics.kong_latency = prometheus:histogram("kong_latency_ms",
-                                              "Latency added by Kong and enabled plugins " ..
-                                              "for each service/route in Kong",
-                                              {"service", "route"},
-                                              KONG_LATENCY_BUCKETS)
-  metrics.upstream_latency = prometheus:histogram("upstream_latency_ms",
-                                                  "Latency added by upstream response " ..
-                                                  "for each service/route in Kong",
-                                                  {"service", "route"},
-                                                  UPSTREAM_LATENCY_BUCKETS)
-
-
-  if http_subsystem then
-    metrics.total_latency = prometheus:histogram("request_latency_ms",
-                                                 "Total latency incurred during requests " ..
-                                                 "for each service/route in Kong",
-                                                 {"service", "route"},
-                                                 UPSTREAM_LATENCY_BUCKETS)
-  else
-    metrics.total_latency = prometheus:histogram("session_duration_ms",
-                                                 "latency incurred in stream session " ..
-                                                 "for each service/route in Kong",
-                                                 {"service", "route"},
-                                                 UPSTREAM_LATENCY_BUCKETS)
-  end
-
-  if http_subsystem then
-    metrics.bandwidth = prometheus:counter("bandwidth_bytes",
-                                          "Total bandwidth (ingress/egress) " ..
-                                          "throughput in bytes",
-                                          {"service", "route", "direction", "consumer"})
-  else -- stream has no consumer
-    metrics.bandwidth = prometheus:counter("bandwidth_bytes",
-                                          "Total bandwidth (ingress/egress) " ..
-                                          "throughput in bytes",
-                                          {"service", "route", "direction"})
-  end
-  ]]--
-
-  -- eni
   metrics.status = prometheus:counter("http_requests_total",
     "HTTP status codes per consumer/method/route in Kong",
     {"route", "method", "consumer", "source", "code"})
@@ -256,10 +206,10 @@ local function log(message, serialized)
     if message and serialized.consumer ~= nil then
       consumer = serialized.consumer
       --eni part start
-      if consumer == "gateway" then
+      if consumer == HORIZON_CONSUMER then
         local pubsub_consumer = ngx.var.http_x_pubsub_subscriber_id
         if pubsub_consumer then
-          consumer = "gateway:" .. pubsub_consumer
+          consumer = HORIZON_CONSUMER .. ":" .. pubsub_consumer
         end
       end
       --eni part stop
@@ -267,74 +217,6 @@ local function log(message, serialized)
   else
     consumer = nil -- no consumer in stream
   end
-
-  --[[bandwidth
-  if serialized.ingress_size or serialized.egress_size then
-    labels_table_bandwidth[1] = service_name
-    labels_table_bandwidth[2] = route_name
-    labels_table_bandwidth[4] = consumer
-
-    local ingress_size = serialized.ingress_size
-    if ingress_size and ingress_size > 0 then
-      labels_table_bandwidth[3] = "ingress"
-      metrics.bandwidth:inc(ingress_size, labels_table_bandwidth)
-    end
-
-    local egress_size = serialized.egress_size
-    if egress_size and egress_size > 0 then
-      labels_table_bandwidth[3] = "egress"
-      metrics.bandwidth:inc(egress_size, labels_table_bandwidth)
-    end
-  end
-  ]]--
-
-  --[[status
-  if serialized.status_code then
-    labels_table_status[1] = service_name
-    labels_table_status[2] = route_name
-    labels_table_status[3] = serialized.status_code
-
-    if kong.response.get_source() == "service" then
-      labels_table_status[4] = "service"
-    else
-      labels_table_status[4] = "kong"
-    end
-
-    labels_table_status[5] = consumer
-
-    metrics.status:inc(1, labels_table_status)
-  end
-  ]]--
-
-  --[[latency
-  if serialized.latencies then
-    labels_table_latency[1] = service_name
-    labels_table_latency[2] = route_name
-
-    if http_subsystem then
-      local request_latency = serialized.latencies.request
-      if request_latency and request_latency >= 0 then
-        metrics.total_latency:observe(request_latency, labels_table_latency)
-      end
-
-      local upstream_latency = serialized.latencies.proxy
-      if upstream_latency ~= nil and upstream_latency >= 0 then
-        metrics.upstream_latency:observe(upstream_latency, labels_table_latency)
-      end
-
-    else
-      local session_latency = serialized.latencies.session
-      if session_latency and session_latency >= 0 then
-        metrics.total_latency:observe(session_latency, labels_table_latency)
-      end
-    end
-
-    local kong_proxy_latency = serialized.latencies.kong
-    if kong_proxy_latency ~= nil and kong_proxy_latency >= 0 then
-      metrics.kong_latency:observe(kong_proxy_latency, labels_table_latency)
-    end
-  end
-  ]]--
 
   --eni part start
   if serialized.status_code then
@@ -369,7 +251,7 @@ local function log(message, serialized)
     end
   end
 
-  if serialized.latencies then
+  if serialized.latencies and not find(route_name, LATENCY_OMIT_PATTERN) then
     labels_table_latency[1] = route_name
     labels_table_latency[2] = serialized.method
     labels_table_latency[3] = consumer
