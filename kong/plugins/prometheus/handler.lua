@@ -63,6 +63,10 @@ function PrometheusHandler.log(self, conf)
     exporter.set_export_upstream_health_metrics(false)
   end
 
+  if conf.latency_metrics then
+    serialized.latencies = message.latencies
+  end
+
   exporter.log(message, serialized)
 end
 
