@@ -3,6 +3,9 @@
 This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
+## 2.8.3.10
+- remove eni metrics
+
 ## 2.8.3.9
 - keep eni metrics, enable adapted metrics - provided both
 
