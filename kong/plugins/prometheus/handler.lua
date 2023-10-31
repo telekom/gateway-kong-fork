@@ -63,6 +63,9 @@ function PrometheusHandler.log(self, conf)
     exporter.set_export_upstream_health_metrics(false)
   end
 
+  serialized.customer_facing = conf.customer_facing
+
+
   exporter.log(message, serialized)
 end
 

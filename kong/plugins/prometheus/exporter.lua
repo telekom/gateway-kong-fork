@@ -113,6 +113,24 @@ local function init()
       "throughput in bytes",
     {"route", "direction", "consumer"})
 
+  -- eni
+  metrics.eni_status = prometheus:counter("eni_http_status",
+    "HTTP status codes for customer per route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "code"})
+
+  metrics.eni_latency = prometheus:histogram("eni_latency",
+    "Latency added by Kong, total " ..
+      "request time and upstream latency " ..
+      "for each route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "type"},
+    ENI_LATENCY_BUCKETS)
+
+  metrics.eni_bandwidth = prometheus:counter("eni_bandwidth",
+    "Bandwidth in bytes " ..
+      "consumed per route/method/consumer in Kong",
+    {"route", "method", "consumer", "customer_facing", "type"})
+
+
   -- Hybrid mode status
   if role == "control_plane" then
     metrics.data_plane_last_seen = prometheus:gauge("data_plane_last_seen",
@@ -162,6 +180,7 @@ end
 local labels_table_bandwidth = {0, 0, 0}
 local labels_table_status = {0, 0, 0, 0, 0}
 local labels_table_latency = {0, 0, 0}
+local labels_tableEni = {0, 0, 0, 0, 0}
 local upstream_target_addr_health_table = {
   { value = 0, labels = { 0, 0, 0, "healthchecks_off", ngx.config.subsystem } },
   { value = 0, labels = { 0, 0, 0, "healthy", ngx.config.subsystem } },
@@ -263,7 +282,45 @@ local function log(message, serialized)
       end
     end
   end
+
+  --eni part start
+  if consumer then
+    labels_tableEni[1] = route_name
+    labels_tableEni[2] = serialized.method
+    labels_tableEni[3] = consumer
+    labels_tableEni[4] = serialized.customer_facing
+    labels_tableEni[5] = message.response.status
+    metrics.eni_status:inc(1, labels_tableEni)
+
+    local ingress_size = serialized.ingress_size
+    if ingress_size and ingress_size > 0 then
+      labels_tableEni[5] = "ingress"
+      metrics.eni_bandwidth:inc(ingress_size, labels_tableEni)
+    end
+
+    local egress_size = serialized.egress_size
+    if egress_size and egress_size > 0 then
+      labels_tableEni[5] = "egress"
+      metrics.eni_bandwidth:inc(egress_size, labels_tableEni)
+    end
+
+    if serialized.latencies then
+      local request_latency = serialized.latencies.request
+      if request_latency and request_latency >= 0 then
+        labels_tableEni[5] = "request"
+        metrics.eni_latency:observe(request_latency, labels_tableEni)
+      end
+
+      local upstream_latency = serialized.latencies.proxy
+      if upstream_latency ~= nil and upstream_latency >= 0 then
+        labels_tableEni[5] = "upstream"
+        metrics.eni_latency:observe(upstream_latency, labels_tableEni)
+      end
+    end
+
+  end
   --eni part end
+
 end
 
 -- The upstream health metrics is turned on if at least one of

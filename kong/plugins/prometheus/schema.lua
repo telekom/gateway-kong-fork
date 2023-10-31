@@ -21,6 +21,8 @@ return {
           { latency_metrics = { type = "boolean", default = false }, },
           { bandwidth_metrics = { type = "boolean", default = false }, },
           { upstream_health_metrics = { type = "boolean", default = false }, },
+          { eni_stat = { type = "boolean", default = false }, },
+          { customer_facing = { type = "string", default = "false" }, },
         },
         custom_validator = validate_shared_dict,
     }, },
