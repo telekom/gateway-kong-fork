@@ -4,7 +4,7 @@ This document show changes done by ENI teams to original Kong.
 
 [[_TOC_]]
 ## 2.8.3.9
-- remove duplicate metrics
+- keep eni metrics, enable adapted metrics - provided both
 
 ## 2.8.3.8
 - zipkin fix
