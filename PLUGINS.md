@@ -1,7 +1,7 @@
 # Stargate and Kong plugins
-In this document we will talk about the Kong gateway plugins and how the Tardis Stargate uses them to provide its features.
+In this document we will talk about the Kong gateway plugins and how Stargate uses them to provide its features.
 
-Last updated on 2023-10-28.
+Last updated on 2023-11-03.
 
 ## Contents
 - What are Kong plugins and why do we use them
@@ -24,7 +24,7 @@ Stargate uses Kong plugins to facilitate some of its features, like for example:
 - request size limiting
 - cors
 
-All plugins that we use directly or in their customized version are included in the docker image that we build and deploy.
+All plugins that we use with or without customizations are bundled in the docker image.
 
 ## Customization of plugins for Stargate
 ### Prometheus
@@ -49,9 +49,9 @@ All plugins that we use directly or in their customized version are included in 
 - originally, every request reported 8 spans - 3 for kong and 5 for the jumper component, we combined the 3 kong spans into one
     - since we have disabled the kong balancer, we are only using the Request and Proxy spans, while the relevant balancer span events are moved to the proxy span
 - replaced the kong consumer id by kong consumer name which is more human-readable
-- related to Horizon - the eventing component of Tardis - we added the publisher and subscriber id - also to improve readability and make it easier to debug problems
-- added the X-tardis-traceid - included in all spans - helps to collect all spans related to the lifecycle of a request across all Tardis components
-- added the X-tardis-consumer-side tag which helps identify the first span of the request and this then helps calculate how long it took Tardis to handle the request
+- related to Horizon - the eventing component - we added the publisher and subscriber id - to improve readability and make it easier to debug problems
+- added the X-tardis-traceid - included in all spans - helps to collect all spans related to the lifecycle of a request across all T‧AR‧D‧I‧S components
+- added the X-tardis-consumer-side tag which helps identify the first span of the request and this then helps calculate how long it took T‧AR‧D‧I‧S to handle the request
 
 ### JWT Keycloak
 - official website - https://github.com/gbbirkisson/kong-plugin-jwt-keycloak
