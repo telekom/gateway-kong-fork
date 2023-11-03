@@ -24,7 +24,7 @@ Stargate uses Kong plugins to facilitate some of its features, like for example:
 - request size limiting
 - cors
 
-All plugins that we use with or without customizations are bundled in the docker image.
+All plugins with or without customizations are bundled in the docker image.
 
 ## Customization of plugins for Stargate
 ### Prometheus
