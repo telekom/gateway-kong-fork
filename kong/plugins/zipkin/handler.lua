@@ -77,18 +77,6 @@ local function tag_with_service(span, conf_environment)
     end
   end
 
---[[ on tardis service_name == route_name, so no need to provide both
-
-  local route = kong.router.get_route()
-  if route then
-    if route.id then
-      span:set_tag("kong.route", route.id)
-    end
-    if type(route.name) == "string" then
-      span:set_tag("kong.route_name", route.name)
-    end
-  end
---]]
 end
 
 -- adds the proxy span to the zipkin context, unless it already exists
@@ -420,29 +408,6 @@ function ZipkinLogHandler:log(conf) -- luacheck: ignore 212
         proxy_span:annotate(fmt("btf.%d", i), now_mu)
       end
 
-      --[[ merge all available information to proxy span instead of creating additional span(s)
-      local name = fmt("%s (balancer try %d)", request_span.name, i)
-      local span = request_span:new_child("CLIENT", name, try.balancer_start * 1000)
-      span.ip = try.ip
-      span.port = try.port
-
-      span:set_tag("kong.balancer.try", i)
-      if i < balancer_data.try_count then
-        span:set_tag("error", true)
-        span:set_tag("kong.balancer.state", try.state)
-        span:set_tag("http.status_code", try.code)
-      end
-
-      tag_with_service_and_route(span)
-      copy_tardis_tags_to_child(request_span, span)
-
-      if try.balancer_latency ~= nil then
-        span:finish((try.balancer_start + try.balancer_latency) * 1000)
-      else
-        span:finish(now_mu)
-      end
-      reporter:report(span)
-    --]]
     end
     proxy_span:set_tag("peer.hostname", balancer_data.hostname) -- could be nil
     proxy_span.ip   = balancer_data.ip
