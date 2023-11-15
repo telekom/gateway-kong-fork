@@ -1,6 +1,12 @@
 load("@kong_bindings//:variables.bzl", "KONG_VAR")
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("//build:build_system.bzl", "kong_directory_genrule", "kong_rules_group", "kong_template_file")
+load("//build/vector:rules.bzl", "vector_binaries_rule")
+
+vector_binaries_rule(
+    name = "vector_binaries",
+    visibility = ["//visibility:public"],
+)
 
 exports_files([
     "package/nfpm.yaml",
@@ -90,6 +96,7 @@ kong_directory_genrule(
         "@openresty",
         "@openresty//:luajit",
         "@protoc//:all_srcs",
+        ":vector_binaries",
     ] + select({
         "@kong//:skip_webui_flags": [],
         "//conditions:default": [
@@ -174,6 +181,10 @@ kong_directory_genrule(
             fi
         done
         LN ${BUILD_DESTDIR}/openresty/nginx/sbin/nginx ${BUILD_DESTDIR}/openresty/bin/openresty
+
+        VECTOR=${WORKSPACE_PATH}/$(dirname $(echo '$(locations :vector_binaries)' | awk '{print $1}'))
+        # -L dereference symlinks
+        cp -Lr ${VECTOR}/bin ${BUILD_DESTDIR}/.
     """,
     # XXX: bazel forces 0555 as artifact permission, which is not correct for packagin
     # here we deliberately use a different directory so file permission is preserved

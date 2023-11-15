@@ -63,3 +63,7 @@ toolchain_repositories()
 load("//build/toolchain:managed_toolchain.bzl", "register_all_toolchains")
 
 register_all_toolchains()
+
+load("//build/vector:vector_repositories.bzl", "vector_repositories")
+
+vector_repositories()

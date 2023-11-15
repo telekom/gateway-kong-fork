@@ -208,3 +208,22 @@ github_release = repository_rule(
         "skip_add_copyright_header": attr.bool(default = False, doc = "Whether to inject COPYRIGHT-HEADER into downloaded files, only required for webuis"),
     },
 )
+
+def _kong_arch_dependent_binaries_link_impl(ctx):
+    symlinks = []
+    for file in ctx.files.src:
+        # strip ../REPO_NAME/ from the path
+        path = "/".join(file.short_path.split("/")[2:])
+        symlink = ctx.actions.declare_file(ctx.attr.prefix + "/" + path)
+        symlinks.append(symlink)
+        ctx.actions.symlink(output = symlink, target_file = file)
+
+    return [DefaultInfo(files = depset(symlinks))]
+
+kong_arch_dependent_binaries_link = rule(
+    implementation = _kong_arch_dependent_binaries_link_impl,
+    attrs = {
+        "prefix": attr.string(),
+        "src": attr.label(),
+    },
+)

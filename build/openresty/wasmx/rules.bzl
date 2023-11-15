@@ -1,4 +1,5 @@
 load("//build/openresty/wasmx:wasmx_repositories.bzl", "wasm_runtimes")
+load("//build:build_system.bzl", "kong_arch_dependent_binaries_link")
 
 wasmx_configure_options = select({
     "@kong//:wasmx_el7_workaround_flag": [
@@ -46,25 +47,6 @@ wasmx_env = select({
     "//conditions:default": {},
 })
 
-def _wasm_runtime_link_impl(ctx):
-    symlinks = []
-    for file in ctx.files.runtime:
-        # strip ../REPO_NAME/ from the path
-        path = "/".join(file.short_path.split("/")[2:])
-        symlink = ctx.actions.declare_file(ctx.attr.prefix + "/" + path)
-        symlinks.append(symlink)
-        ctx.actions.symlink(output = symlink, target_file = file)
-
-    return [DefaultInfo(files = depset(symlinks))]
-
-_wasm_runtime_link = rule(
-    implementation = _wasm_runtime_link_impl,
-    attrs = {
-        "prefix": attr.string(),
-        "runtime": attr.label(),
-    },
-)
-
 def wasm_runtime(**kwargs):
     select_conds = {}
     for runtime in wasm_runtimes:
@@ -73,8 +55,8 @@ def wasm_runtime(**kwargs):
                 select_conds["@wasmx_config_settings//:use_%s_%s_%s" % (runtime, os, arch)] = \
                     "@%s-%s-%s//:all_srcs" % (runtime, os, arch)
 
-    _wasm_runtime_link(
+    kong_arch_dependent_binaries_link(
         prefix = kwargs["name"],
-        runtime = select(select_conds),
+        src = select(select_conds),
         **kwargs
     )
