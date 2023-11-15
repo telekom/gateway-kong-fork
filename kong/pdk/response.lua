@@ -19,6 +19,7 @@ local phase_checker = require "kong.pdk.private.phases"
 local utils = require "kong.tools.utils"
 local request_id = require "kong.tracing.request_id"
 
+cjson.encode_number_precision(16)
 
 local ngx = ngx
 local arg = ngx.arg
