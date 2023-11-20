@@ -1512,7 +1512,13 @@ describe("routes schema (flavor = expressions)", function()
   end)
 
   it("http route still supports net.port but with warning", function()
+    local ngx_log = ngx.log
     local log = spy.on(ngx, "log")
+
+    finally(function()
+      ngx.log = ngx_log
+    end)
+
     local route = {
       id             = a_valid_uuid,
       name           = "my_route",
