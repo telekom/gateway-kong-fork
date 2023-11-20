@@ -27,14 +27,16 @@ local function verify_expression(route)
     return nil
   end
 
-  if exp:find("net.port", 1, true) then
-    ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
-                      "please use 'net.dst.port' instead.")
-
-    return exp:gsub("net%.port", "net.dst.port")
+  if not exp:find("net.port", 1, true) then
+    return exp
   end
 
-  return exp
+  -- there is "net.port" in expression
+
+  ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
+                    "please use 'net.dst.port' instead.")
+
+  return exp:gsub("net%.port", "net.dst.port")
 end
 _M.verify_expression = verify_expression
 
