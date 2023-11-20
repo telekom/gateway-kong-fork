@@ -5,6 +5,9 @@ load_module $(wasm_dynamic_module);
 > end
 
 error_log ${{PROXY_ERROR_LOG}} ${{LOG_LEVEL}};
+> if extra_error_log_path then
+error_log ${{extra_error_log_path}} ${{LOG_LEVEL}};
+> end
 
 # injected nginx_main_* directives
 > for _, el in ipairs(nginx_main_directives) do

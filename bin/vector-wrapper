@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# This wrapper script is used to run vector using the plugin server
+# mechanism.  vector needs to terminate when its parent process dies
+# for any reason.  This script implements that behavior and forwards
+# all signals that it receives to the vector process.  The vector
+# process itself must run in the foreground.
+
+# Furthermore, this script rotates the nginx error log file tracked by
+# vector once every minute.
+
+# usage: vector-wrapper <vector-logfile> [ <vector-arg> ... ]
+
+set -ex
+
+ROTATE_SECONDS=${ROTATE_SECONDS:-60}
+
+PATH=/Users/hans/Development/kong/kong/bazel-bin/build/kong-dev/bin:/opt/homebrew/bin:$PATH
+
+pstree -p$$
+
+worker_pid=$(ps -o ppid= -p $$)
+master_pid=$(ps -o ppid= -p $worker_pid)
+echo worker_pid $worker_pid master_pid $master_pid
+
+vector_logfile=$1
+shift
+
+vector "$@" &
+vector_pid=$!
+
+runtime=0
+
+rotate_time=$(date +%2)
+
+forward_signal() {
+    local signal=$1
+    echo "forwarding signal $1 to vector (pid $vector_pid)"
+    kill -$signal $vector_pid
+}
+
+for signal in $(/bin/kill -l)
+do
+    trap "forward_signal $signal" $signal
+done
+
+while true
+do
+    if ! kill -0 $vector_pid >& /dev/null
+    then
+        wait >& /dev/null
+        exit 1
+    fi
+    if ! kill -0 $worker_pid >& /dev/null
+    then
+        kill -TERM $vector_pid
+        wait >& /dev/null
+        exit 1
+    fi
+    sleep 1
+    runtime=$((runtime + 1))
+    if [ $runtime == $ROTATE_SECONDS ]
+    then
+        runtime=0
+        rm -f $vector_logfile
+        kill -USR1 $master_pid
+    fi
+done
