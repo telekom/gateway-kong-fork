@@ -1512,6 +1512,7 @@ describe("routes schema (flavor = expressions)", function()
   end)
 
   it("http route still supports net.port but with warning", function()
+    local log = spy.on(ngx, "log")
     local route = {
       id             = a_valid_uuid,
       name           = "my_route",
@@ -1520,8 +1521,13 @@ describe("routes schema (flavor = expressions)", function()
       priority       = 100,
       service        = { id = another_uuid },
     }
+
     route = Routes:process_auto_fields(route, "insert")
     assert.truthy(Routes:validate(route))
+
+    assert.spy(log).was.called_with(ngx.WARN,
+                                    "The field 'net.port' of expression is deprecated, " ..
+                                    "please use 'net.dst.port' instead.")
   end)
 
   it("http route supports net.src.* fields", function()
