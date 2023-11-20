@@ -31,7 +31,7 @@ local function verify_expression(route)
     ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
                       "please use 'net.dst.port' instead.")
 
-    return exp:gsub("net%.port%s*==", "net.dst.port ==")
+    return exp:gsub("net%.port", "net.dst.port")
   end
 
   return exp
