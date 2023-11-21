@@ -1,11 +1,15 @@
 local _M = {}
 
 
+local re_gsub = ngx.re.gsub
+
+
 local atc = require("kong.router.atc")
 local gen_for_field = atc.gen_for_field
 
 
 local OP_EQUAL    = "=="
+local NET_PORT_REG = [[(net\.port)(\s*)([=><!])]]
 
 
 local LOGICAL_AND = atc.LOGICAL_AND
@@ -33,10 +37,14 @@ local function verify_expression(route)
 
   -- there is "net.port" in expression
 
-  ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
-                    "please use 'net.dst.port' instead.")
+  local new_exp = re_gsub(exp, NET_PORT_REG, "net.dst.port$2$3")
 
-  return exp:gsub("net%.port", "net.dst.port")
+  if exp ~= new_exp then
+    ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
+                      "please use 'net.dst.port' instead.")
+  end
+
+  return new_exp
 end
 _M.verify_expression = verify_expression
 
