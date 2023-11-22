@@ -10,6 +10,7 @@ local gen_for_field = atc.gen_for_field
 
 local OP_EQUAL    = "=="
 local NET_PORT_REG = [[(net\.port)(\s*)([=><!])]]
+local NET_PORT_REPLACE = [[net.dst.port$2$3]]
 
 
 local LOGICAL_AND = atc.LOGICAL_AND
@@ -37,7 +38,7 @@ local function verify_expression(route)
 
   -- there is "net.port" in expression
 
-  local new_exp = re_gsub(exp, NET_PORT_REG, "net.dst.port$2$3")
+  local new_exp = re_gsub(exp, NET_PORT_REG, NET_PORT_REPLACE)
 
   if exp ~= new_exp then
     ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
