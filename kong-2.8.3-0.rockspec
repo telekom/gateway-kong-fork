@@ -462,9 +462,6 @@ build = {
     ["kong.plugins.post-function.handler"] = "kong/plugins/post-function/handler.lua",
     ["kong.plugins.post-function.schema"] = "kong/plugins/post-function/schema.lua",
 
-    ["kong.plugins.cequence-ai-unified.handler"] = "kong/plugins/cequence-ai-unified/handler.lua",
-    ["kong.plugins.cequence-ai-unified.schema"] = "kong/plugins/cequence-ai-unified/schema.lua",
-
     ["kong.plugins.zipkin.handler"] = "kong/plugins/zipkin/handler.lua",
     ["kong.plugins.zipkin.reporter"] = "kong/plugins/zipkin/reporter.lua",
     ["kong.plugins.zipkin.span"] = "kong/plugins/zipkin/span.lua",

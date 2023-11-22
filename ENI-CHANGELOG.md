@@ -13,10 +13,7 @@ This document show changes done by ENI teams to original Kong.
 - zipkin fix
 
 ## 2.8.3.7
-- skipped due to cequence version
-
-## 2.8.3.7
- - Added cequence-ai-unified plugin
+- skipped due to a cequence version
 
 ## 2.8.3.6
  - Bugfix: Wrong Kong version in admin API
