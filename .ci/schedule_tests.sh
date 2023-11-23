@@ -47,7 +47,7 @@ ALL_TESTS_FILE=all-tests.txt
 ) > $ALL_TESTS_FILE
 
 
-if psql -q -c "delete from busted_test_run_request where workflow_id = $WORKFLOW_ID;"
+if psql -q -c "delete from busted_test_run_request where workflow_id = $WORKFLOW_ID or now() - created_at > interval '3 months';"
 then
   psql -1 -q -v ON_ERROR_STOP=1 -c '\copy busted_test_run_request (workflow_id, test_file, suite, exclude_tags, environment) from stdin' < $ALL_TESTS_FILE
 else
