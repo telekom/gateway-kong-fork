@@ -77,7 +77,7 @@ do
     COUNT=$(( COUNT + 1 ))
     echo "### Running #$COUNT $busted_test_run"
     output_file=/tmp/test-out.$$.txt
-    env $environment bin/busted -o gtest --exclude-tags=$exclude_tags $test_file 2>&1 | tee $output_file
+    env $environment bin/busted -o gtest --Xoutput --color --exclude-tags=$exclude_tags $test_file 2>&1 | tee $output_file
     if [ ${PIPESTATUS[0]} = 0 ]
     then
         STATUS=passed
