@@ -1,6 +1,6 @@
 CREATE TYPE test_run_status AS ENUM ('running', 'passed', 'failed');
 
-CREATE TABLE busted_test_run_request
+CREATE TABLE IF NOT EXISTS busted_test_run_request
 (
     id           SERIAL PRIMARY KEY,
     workflow_id  BIGINT    NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE busted_test_run_request
     environment  VARCHAR   NOT NULL
 );
 
-CREATE TABLE busted_test_run
+CREATE TABLE IF NOT EXISTS busted_test_run
 (
     id                         SERIAL PRIMARY KEY,
     busted_test_run_request_id INT REFERENCES busted_test_run_request (id) ON DELETE CASCADE,
@@ -108,14 +108,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create trigger for INSERT on busted_test_run
-CREATE TRIGGER busted_test_run_insert_trigger
+CREATE OR REPLACE TRIGGER busted_test_run_insert_trigger
     AFTER INSERT
     ON busted_test_run
     FOR EACH ROW
 EXECUTE FUNCTION notify_busted_test_run();
 
 -- Create trigger for UPDATE on busted_test_run
-CREATE TRIGGER busted_test_run_update_trigger
+CREATE OR REPLACE TRIGGER busted_test_run_update_trigger
     AFTER UPDATE
     ON busted_test_run
     FOR EACH ROW
