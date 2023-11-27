@@ -23,7 +23,7 @@ local _
 local utils = require("kong.resty.dns.utils")
 local fileexists = require("pl.path").exists
 local semaphore = require("ngx.semaphore").new
-local mlcache = require("resty.mlcache")
+local mlcache = require("kong.resty.mlcache")
 local resolver = require("resty.dns.resolver")
 local cycle_aware_deep_copy = require("kong.tools.utils").cycle_aware_deep_copy
 local req_dyn_hook = require("kong.dynamic_hook")
@@ -485,10 +485,11 @@ _M.init = function(options)
   noSynchronisation = options.noSynchronisation
   log(DEBUG, PREFIX, "noSynchronisation = ", tostring(noSynchronisation))
 
-  dnscache = mlcache.new("dns_cache", "dns_cache_dict", {
+  dnscache = mlcache.new("dns_cache", "kong_dns_cache", {
                 lru_size = cacheSize,   -- size of the L1 (Lua VM) cache
                 ttl      = nil,         -- ttl for hits
                 neg_ttl  = nil,         -- ttl for misses
+                ipc_shm  = "kong_dns_cache_ipc",
              })
 
   defined_hosts = {}  -- reset hosts hash table
@@ -505,6 +506,7 @@ _M.init = function(options)
     end
     assert(orderValids[t], "Invalid dns record type in order array; "..tostring(v))
     typeOrder[i] = _M["TYPE_"..t]
+    ngx.log(ngx.ERR, "typeOrder:", typeOrder[i])
   end
   assert(#typeOrder > 0, "Invalid order list; cannot be empty")
   log(DEBUG, PREFIX, "query order = ", table_concat(order,", "))
