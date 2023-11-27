@@ -119,7 +119,7 @@ jobs:
 
     - name: Put status link onto PR
       if: ${{ github.event.number }}
-      run: "gh api /repos/Kong/kong/issues/${{ github.event.number }}/comments -f body='[Scheduled busted tests](https://test-status.kong-gateway.link/test_run/${{ github.run_id }})'"
+      run: "gh api /repos/Kong/kong/issues/${{ github.event.number }}/comments -f body='[Scheduled busted tests](https://ci-insights.kong-gateway.link/test_run/${{ github.run_id }})'"
       env:
         GH_TOKEN: ${{ secrets.PAT }}
 
