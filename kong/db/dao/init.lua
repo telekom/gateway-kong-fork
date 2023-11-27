@@ -1,6 +1,7 @@
 local cjson = require "cjson"
 local iteration = require "kong.db.iteration"
 local utils = require "kong.tools.utils"
+local kong_global = require "kong.global"
 local defaults = require "kong.db.strategies.connector".defaults
 local hooks = require "kong.hooks"
 local workspaces = require "kong.workspaces"
@@ -1461,7 +1462,25 @@ function DAO:row_to_entity(row, options)
 end
 
 
+local function invalidate(schema_name)
+  local key
+  if schema_name == "routes" then
+    key = "router:version"
+  elseif schema_name == "plugins" then
+    key = "plugins_iterator:version"
+  end
+  if key then
+    kong.core_cache:invalidate(key)
+  end
+  local transaction_id = kong_global.get_current_transaction_id()
+  ngx.ctx.transaction_id = transaction_id
+  ngx.shared.kong:set("test:current_transaction_id", transaction_id)
+end
+
+
 function DAO:post_crud_event(operation, entity, old_entity, options)
+  invalidate(self.schema.name)
+
   if options and options.no_broadcast_crud_event then
     return
   end

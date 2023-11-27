@@ -972,8 +972,8 @@ return {
 
           -- Before rebuiding the internal structures, retrieve the current PostgreSQL transaction ID to make it the
           -- current transaction ID after the rebuild has finished.
-          local rebuild_transaction_id, err = global.get_current_transaction_id()
-          if not rebuild_transaction_id then
+          local rebuild_transaction_id, err = kong_shm:get("test:current_transaction_id")
+          if err then
             log(ERR, err)
           end
 
@@ -1116,7 +1116,7 @@ return {
         local if_kong_transaction_id = kong.request and kong.request.get_header('if-kong-test-transaction-id')
         if if_kong_transaction_id then
           if_kong_transaction_id = tonumber(if_kong_transaction_id)
-          if if_kong_transaction_id and if_kong_transaction_id >= global.CURRENT_TRANSACTION_ID then
+          if if_kong_transaction_id and if_kong_transaction_id > global.CURRENT_TRANSACTION_ID then
             return kong.response.error(
                     503,
                     "Service Unavailable",
