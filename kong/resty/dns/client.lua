@@ -23,7 +23,7 @@ local _
 local utils = require("kong.resty.dns.utils")
 local fileexists = require("pl.path").exists
 local semaphore = require("ngx.semaphore").new
-local lrucache = require("resty.lrucache")
+local mlcache = require("resty.mlcache")
 local resolver = require("resty.dns.resolver")
 local cycle_aware_deep_copy = require("kong.tools.utils").cycle_aware_deep_copy
 local req_dyn_hook = require("kong.dynamic_hook")
@@ -139,7 +139,7 @@ local dnscache
 local cachelookup = function(qname, qtype)
   local now = time()
   local key = qtype..":"..qname
-  local cached = dnscache:get(key)
+  local cached, err, hit_level = dnscache:get(key)
 
   local ctx = ngx.ctx
   if ctx and ctx.has_timing then
@@ -165,7 +165,7 @@ local cachelookup = function(qname, qtype)
   return cached
 end
 
--- inserts an entry in the cache.
+-- inserts an entry in the cache.--[[ --]]
 -- @param entry the dns record list to store (may also be an error entry)
 -- @param qname the name under which to store the record (optional for records, not for errors)
 -- @param qtype the query type for which to store the record (optional for records, not for errors)
@@ -259,7 +259,7 @@ local cacheinsert = function(entry, qname, qtype)
     return
   end
 
-  dnscache:set(key, entry, lru_ttl)
+  dnscache:set(key, { ttl = lru_ttl }, entry)
 end
 
 -- Lookup a shortname in the cache.
@@ -282,7 +282,11 @@ end
 -- @param qname name to resolve
 -- @return query/record type constant, or ˋnilˋ if not found
 local function cachegetsuccess(qname)
-  return dnscache:get(qname)
+  --  data, stale_data, flags = cache:get(key)
+  --  ->
+  --  value, err, hit_level = cache:get(key, opts?, callback?, ...)
+  local qtype = dnscache:get(qname)
+  return qtype
 end
 
 -- Sets the last successful query type.
@@ -309,7 +313,7 @@ local function cachesetsuccess(qname, qtype)
     return false
   end
 
-  dnscache:set(qname, qtype)
+  dnscache:set(qname, { ttl = 0 }, qtype)
   --[[
   log(DEBUG, PREFIX, "cache set success: ", qname, " = ", qtype)
   --]]
@@ -481,7 +485,12 @@ _M.init = function(options)
   noSynchronisation = options.noSynchronisation
   log(DEBUG, PREFIX, "noSynchronisation = ", tostring(noSynchronisation))
 
-  dnscache = lrucache.new(cacheSize)  -- clear cache on (re)initialization
+  dnscache = mlcache.new("dns_cache", "dns_cache_dict", {
+                lru_size = cacheSize,   -- size of the L1 (Lua VM) cache
+                ttl      = nil,         -- ttl for hits
+                neg_ttl  = nil,         -- ttl for misses
+             })
+
   defined_hosts = {}  -- reset hosts hash table
 
   local order = options.order or orderValids
