@@ -38,7 +38,7 @@ local function verify_expression(route)
 
   -- there is "net.port" in expression
 
-  local new_exp = re_gsub(exp, NET_PORT_REG, NET_PORT_REPLACE)
+  local new_exp = re_gsub(exp, NET_PORT_REG, NET_PORT_REPLACE, "jo")
 
   if exp ~= new_exp then
     ngx.log(ngx.WARN, "The field 'net.port' of expression is deprecated, " ..
