@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Deutsche Telekom AG
+#
+# SPDX-License-Identifier: CC0-1.0
+
 FROM mtr.devops.telekom.de/tardis-common/kong:2.8.1-alpine as builder
 
 USER root

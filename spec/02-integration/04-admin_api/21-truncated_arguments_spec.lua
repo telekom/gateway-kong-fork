@@ -1,3 +1,7 @@
+-- SPDX-FileCopyrightText: 2023 Deutsche Telekom AG
+--
+-- SPDX-License-Identifier: CC0-1.0
+
 local helpers = require "spec.helpers"
 
 for _, strategy in helpers.each_strategy() do
